@@ -7,7 +7,7 @@
 
         <link rel="alternate"  href="http://www.levigross.com/feeds/all.atom.xml" type="application/atom+xml" title="Über Dig Full Atom Feed"/>
 
-        <title>Welcome to My new Blog // Über Dig // Do the impossible</title>
+        <title>Dealing with the OOO Side Effects in Timing Attacks // Über Dig // Do the impossible</title>
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css">
@@ -34,7 +34,7 @@
                 <h2 class="article-info">Levi Gross</h2>
                 <small class="about-author"></small>
                 <h5>Published</h5>
-                <p>Wed 01 January 2014</p>
+                <p>Sun 02 March 2014</p>
                 <a href="/">&larr;Home</a>
             </hgroup>
         </header>
@@ -43,14 +43,38 @@
         <div class="content">
             <section class="post">
                 <header class="post-header">
-                    <h1>Welcome to My new&nbsp;Blog</h1>
+                    <h1>Dealing with the <span class="caps">OOO</span> Side Effects in Timing&nbsp;Attacks</h1>
                         <p class="post-meta">
                             // under                         </p>
                 </header>
             </section>
-            <p><em><em>Welcome to the new version of&nbsp;LeviGross.com</em></em></p>
-<p>I have decided to move off of tumblr (because no one likes fighting with their blog to display content). I am going to move everything from Tumblr within the next few days (hopefully), so please be&nbsp;patient.</p>
-<p>I will import the items from Tumblr&nbsp;selectively. </p>
+            <p>Cryptographic side-channel attacks have been giving developers headakes for a while.  Did you know that <a href="http://en.wikipedia.org/wiki/Out-of-order_execution">Out Of Order Execution</a> is an important factor in a timing attack? Take this snippet from the <a href="http://golang.org">Go</a> standard&nbsp;library.</p>
+<div class="highlight"><pre><span class="c1">// ConstantTimeCompare returns 1 if the two equal length slices, x</span>
+<span class="c1">// and y, have equal contents. The time taken is a function of the length of</span>
+<span class="c1">// the slices and is independent of the contents.</span>
+
+<span class="kd">func</span> <span class="nx">ConstantTimeCompare</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">v</span> <span class="kt">byte</span>
+
+    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">x</span><span class="p">);</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+        <span class="nx">v</span> <span class="o">|=</span> <span class="nx">x</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">^</span> <span class="nx">y</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">ConstantTimeByteEq</span><span class="p">(</span><span class="nx">v</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="kd">func</span> <span class="nx">ConstantTimeByteEq</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span> <span class="nx">y</span> <span class="kt">uint8</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+    <span class="nx">z</span> <span class="o">:=</span> <span class="p">^(</span><span class="nx">x</span> <span class="p">^</span> <span class="nx">y</span><span class="p">)</span>
+    <span class="nx">z</span> <span class="o">&amp;=</span> <span class="nx">z</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span>
+    <span class="nx">z</span> <span class="o">&amp;=</span> <span class="nx">z</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span>
+    <span class="nx">z</span> <span class="o">&amp;=</span> <span class="nx">z</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nx">z</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>The first part is the standard constant time xor compare that we have seen in every language. The second part is&nbsp;interesting. </p>
             <div class="hr"></div>
             <a href="#" class="go-top">Go Top</a>
 <div class="comments">
