@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Über Dig</title><link href="http://www.levigross.com/" rel="alternate"></link><link href="http://www.levigross.com/feeds/all.atom.xml" rel="self"></link><id>http://www.levigross.com/</id><updated>2014-01-01T00:00:00+00:00</updated><entry><title>37 Tips For Interviewing a tech company</title><link href="http://www.levigross.com/2014/01/01/37-tips-for-interviewing-a-tech-company/" rel="alternate"></link><updated>2014-01-01T00:00:00+00:00</updated><author><name>Levi Gross</name></author><id>tag:www.levigross.com,2014-01-01:2014/01/01/37-tips-for-interviewing-a-tech-company/</id><summary type="html">&lt;p&gt;This is a list of things that &lt;em&gt;&lt;em&gt;I&lt;/em&gt;&lt;/em&gt; look out for when joining companies that I don&amp;#8217;t know much about. You may not agree with everything listed here. I welcome your feedback and counter&amp;nbsp;arguments.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Über Dig</title><link href="http://www.levigross.com/" rel="alternate"></link><link href="http://www.levigross.com/feeds/all.atom.xml" rel="self"></link><id>http://www.levigross.com/</id><updated>2014-07-02T00:00:00+00:00</updated><entry><title>Django Security Interview Questions</title><link href="http://www.levigross.com/2014/07/02/django-security-interview-questions/" rel="alternate"></link><updated>2014-07-02T00:00:00+00:00</updated><author><name>Levi Gross</name></author><id>tag:www.levigross.com,2014-07-02:2014/07/02/django-security-interview-questions/</id><summary type="html">&lt;ol&gt;
+&lt;li&gt;What is wrong with the following template&amp;nbsp;snippet?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;a&lt;/span&gt; &lt;span class="na"&gt;href=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;http://www.google.com/&amp;quot;&lt;/span&gt; &lt;span class="na"&gt;class=&lt;/span&gt;&lt;span class="s"&gt;{{&lt;/span&gt; &lt;span class="na"&gt;user_class&lt;/span&gt; &lt;span class="err"&gt;}}&lt;/span&gt; &lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;Google&lt;span class="nt"&gt;&amp;lt;/a&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ol&gt;
+&lt;li&gt;Identify the security vulnerability in the following code.  What is it? How can it be&amp;nbsp;exploited?&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;CatViewer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;TemplateView&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+    &lt;span class="n"&gt;template_name&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;view_cats.html&amp;#39;&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;post&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="n"&gt;form&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;CatViewForm&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;&lt;span class="caps"&gt;POST&lt;/span&gt;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;is_valid&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cat_image&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;b64encode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;urlopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;instance&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;picture_url&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+        &lt;span class="n"&gt;form&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;redirect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;cat_viewer&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_context_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;form&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;form&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;form&amp;#39;&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;kwargs&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="n"&gt;CatViewForm&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+            &lt;span class="s"&gt;&amp;#39;cat_pics&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;CatView&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;objects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;all&lt;/span&gt;&lt;span class="p"&gt;(),&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ol&gt;
+&lt;li&gt;Provide ways to identify a Django application during a blackbox&amp;nbsp;test?&lt;/li&gt;
+&lt;li&gt;What is the default password hash algorithm that Django uses? Were there any recent&amp;nbsp;changes?&lt;/li&gt;
+&lt;li&gt;Given a Django settings file, which items would stand out (whether they are missing or not) and&amp;nbsp;why?&lt;/li&gt;
+&lt;li&gt;How does Django know to escape certain&amp;nbsp;values?&lt;/li&gt;
+&lt;li&gt;Are Django values &amp;#8220;safe&amp;#8221; when rendered in&amp;nbsp;Javascript?&lt;/li&gt;
+&lt;li&gt;Is it possible to execute a mass assignment attack against a Django model? If yes, how and&amp;nbsp;when?&lt;/li&gt;
+&lt;li&gt;What parts of Django are susceptible to &lt;span class="caps"&gt;SQL&lt;/span&gt; injection attacks and how does Django defend against these&amp;nbsp;attacks?&lt;/li&gt;
+&lt;li&gt;Why is the SECRET_KEY so&amp;nbsp;important?&lt;/li&gt;
+&lt;li&gt;When looking for a denial of service vector, which part of Django stands out as the most&amp;nbsp;vulnerable?&lt;/li&gt;
+&lt;li&gt;Is Django threadsafe? If not, how does this effect the security of the&amp;nbsp;application?&lt;/li&gt;
+&lt;li&gt;How does Django&amp;#8217;s permission model work? Is it&amp;nbsp;effective?&lt;/li&gt;
+&lt;li&gt;How does Django&amp;#8217;s file uploading functionality work? How would you make it more&amp;nbsp;secure?&lt;/li&gt;
+&lt;li&gt;How does Django deal with directory traversal&amp;nbsp;vulnerabilities?&lt;/li&gt;
+&lt;li&gt;How does Django deal with &lt;span class="caps"&gt;CSRF&lt;/span&gt;? Is it totally&amp;nbsp;effective?&lt;/li&gt;
+&lt;/ol&gt;</summary></entry><entry><title>37 Tips For Interviewing a tech company</title><link href="http://www.levigross.com/2014/01/01/37-tips-for-interviewing-a-tech-company/" rel="alternate"></link><updated>2014-01-01T00:00:00+00:00</updated><author><name>Levi Gross</name></author><id>tag:www.levigross.com,2014-01-01:2014/01/01/37-tips-for-interviewing-a-tech-company/</id><summary type="html">&lt;p&gt;This is a list of things that &lt;em&gt;&lt;em&gt;I&lt;/em&gt;&lt;/em&gt; look out for when joining companies that I don&amp;#8217;t know much about. You may not agree with everything listed here. I welcome your feedback and counter&amp;nbsp;arguments.&lt;/p&gt;
 &lt;h2&gt;What to&amp;nbsp;avoid&lt;/h2&gt;
 &lt;h3&gt;1. Avoid companies that are &lt;em&gt;obsessed&lt;/em&gt; with a specific technology stack (unless you are as&amp;nbsp;well)&lt;/h3&gt;
 &lt;p&gt;Let&amp;#8217;s face it, technology stacks are a means to an end. Focusing on the technology instead of the solution is a recipe for disaster. Specific technology stacks are not guarantees for success and therefore should not be obsessed&amp;nbsp;over.&lt;/p&gt;

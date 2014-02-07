@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Über Dig, Do the impossible">
+
+        <link rel="alternate"  href="http://www.levigross.com/feeds/all.atom.xml" type="application/atom+xml" title="Über Dig Full Atom Feed"/>
+
+        <title>Django Security Interview Questions // Über Dig // Do the impossible</title>
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://www.levigross.com/theme/css/pure.css">
+    <link rel="stylesheet" href="http://www.levigross.com/theme/css/pygments.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+<div class="pure-g-r" id="layout">
+    <div class="sidebar sidebar-article pure-u">
+        <header class="header-article">
+            <hgroup>
+                <a href="http://www.levigross.com/author/levi-gross" title="See posts by Levi Gross">
+                    <img class="article-avatar" alt="Levi Gross" src="http://www.gravatar.com/avatar/08a35b1a9fbd56f9c24a3482c67ff031">
+                </a>
+                <h2 class="article-info">Levi Gross</h2>
+                <small class="about-author"></small>
+                <h5>Published</h5>
+                <p>Wed 02 July 2014</p>
+                <a href="/">&larr;Home</a>
+            </hgroup>
+        </header>
+    </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Django Security Interview&nbsp;Questions</h1>
+                        <p class="post-meta">
+                            // under                         </p>
+                </header>
+            </section>
+            <ol>
+<li>What is wrong with the following template&nbsp;snippet?</li>
+</ol>
+<div class="highlight"><pre><span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://www.google.com/&quot;</span> <span class="na">class=</span><span class="s">{{</span> <span class="na">user_class</span> <span class="err">}}</span> <span class="nt">&gt;</span>Google<span class="nt">&lt;/a&gt;</span>
+</pre></div>
+
+
+<ol>
+<li>Identify the security vulnerability in the following code.  What is it? How can it be&nbsp;exploited?</li>
+</ol>
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">CatViewer</span><span class="p">(</span><span class="n">TemplateView</span><span class="p">):</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s">&#39;view_cats.html&#39;</span>
+
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">CatViewForm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n"><span class="caps">POST</span></span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="n">form</span><span class="p">)</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">cat_image</span> <span class="o">=</span> <span class="n">b64encode</span><span class="p">(</span><span class="n">urlopen</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">picture_url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;cat_viewer&#39;</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s">&#39;form&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s">&#39;form&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s">&#39;form&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="k">else</span> <span class="n">CatViewForm</span><span class="p">(),</span>
+            <span class="s">&#39;cat_pics&#39;</span><span class="p">:</span> <span class="n">CatView</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+        <span class="p">}</span>
+</pre></div>
+
+
+<ol>
+<li>Provide ways to identify a Django application during a blackbox&nbsp;test?</li>
+<li>What is the default password hash algorithm that Django uses? Were there any recent&nbsp;changes?</li>
+<li>Given a Django settings file, which items would stand out (whether they are missing or not) and&nbsp;why?</li>
+<li>How does Django know to escape certain&nbsp;values?</li>
+<li>Are Django values &#8220;safe&#8221; when rendered in&nbsp;Javascript?</li>
+<li>Is it possible to execute a mass assignment attack against a Django model? If yes, how and&nbsp;when?</li>
+<li>What parts of Django are susceptible to <span class="caps">SQL</span> injection attacks and how does Django defend against these&nbsp;attacks?</li>
+<li>Why is the SECRET_KEY so&nbsp;important?</li>
+<li>When looking for a denial of service vector, which part of Django stands out as the most&nbsp;vulnerable?</li>
+<li>Is Django threadsafe? If not, how does this effect the security of the&nbsp;application?</li>
+<li>How does Django&#8217;s permission model work? Is it&nbsp;effective?</li>
+<li>How does Django&#8217;s file uploading functionality work? How would you make it more&nbsp;secure?</li>
+<li>How does Django deal with directory traversal&nbsp;vulnerabilities?</li>
+<li>How does Django deal with <span class="caps">CSRF</span>? Is it totally&nbsp;effective?</li>
+</ol>
+            <div class="hr"></div>
+            <a href="#" class="go-top">Return to the top of the page</a>
+<div class="comments">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = "levigross"; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div><footer class="footer">
+    <p>&copy; Über Dig</p>
+</footer>        </div>
+    </div>
+</div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        try {
+            var pageTracker = _gat._getTracker("UA-19381157-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+    </script>
+</body>
+</html>
