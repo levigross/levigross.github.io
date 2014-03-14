@@ -61,6 +61,33 @@
         <a href="http://www.levigross.com/author/levi-gross" title="See posts by Levi Gross">
             <img class="avatar" alt="Levi Gross" src="http://www.gravatar.com/avatar/08a35b1a9fbd56f9c24a3482c67ff031">
         </a>
+        <h3><a class="post-title" href="http://www.levigross.com/2014/03/13/spot-the-vulnerability/">Spot the&nbsp;vulnerability</a></h3>
+            <p class="post-meta"><p>I wrote some code today to extract ZipFiles in Go. The code includes a security issue, can you spot&nbsp;it?</p>
+<h2>Not for use in a real&nbsp;environment!</h2>
+<div class="highlight"><pre><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="p">(</span>
+    <span class="s">&quot;archive/zip&quot;</span>
+    <span class="s">&quot;flag&quot;</span>
+    <span class="s">&quot;fmt&quot;</span>
+    <span class="s">&quot;io&quot;</span>
+    <span class="s">&quot;log&quot;</span>
+    <span class="s">&quot;os&quot;</span>
+    <span class="s">&quot;path&quot;</span>
+    <span class="s">&quot;path/filepath&quot;</span>
+<span class="p">)</span>
+
+<span class="kd">var</span> <span class="nx">file_name</span> <span class="p">=</span> <span class="nx">flag</span><span class="p">.</span><span class="nx">String</span><span class="p">(</span><span class="s">&quot;file_name&quot;</span><span class="p">,</span>
+    <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;This is the zip file ...</span></pre></div></p>
+            <p class="post-meta">
+                in <a href="http://www.levigross.com/category/levigrosscom.html">levigross.com</a> &middot; Thu 13 March 2014
+            </p>
+    </header>
+</section><section class="post">
+    <header class="post-header">
+        <a href="http://www.levigross.com/author/levi-gross" title="See posts by Levi Gross">
+            <img class="avatar" alt="Levi Gross" src="http://www.gravatar.com/avatar/08a35b1a9fbd56f9c24a3482c67ff031">
+        </a>
         <h3><a class="post-title" href="http://www.levigross.com/2014/02/07/constant-time-comparison-functions-in-python-haskell-clojure-java-etc/">Constant Time Comparison Functions in&#8230; Python, Haskell, Clojure, Java&nbsp;etc..</a></h3>
             <p class="post-meta"><p>Here is a list of constant time comparison functions to protect yourself against side-channel timing&nbsp;attacks.</p>
 <h2>Clojure</h2>
