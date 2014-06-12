@@ -1,5 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Über Dig</title><link href="http://www.levigross.com/" rel="alternate"></link><link href="http://www.levigross.com/feeds/all.atom.xml" rel="self"></link><id>http://www.levigross.com/</id><updated>2014-03-30T00:00:00+00:00</updated><entry><title>How to write an encrypt and decrypt API for data at rest in Node.JS</title><link href="http://www.levigross.com/2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-nodejs/" rel="alternate"></link><updated>2014-03-30T00:00:00+00:00</updated><author><name>Levi Gross</name></author><id>tag:www.levigross.com,2014-03-30:2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-nodejs/</id><summary type="html">&lt;p&gt;The following code can be used to encrypt data at rest using Node.&lt;span class="caps"&gt;JS&lt;/span&gt;. The snippet is self contained and should be slightly modified so that key generation doesn&amp;#8217;t happen every time the code is&amp;nbsp;executed.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Über Dig</title><link href="http://www.levigross.com/" rel="alternate"></link><link href="http://www.levigross.com/feeds/all.atom.xml" rel="self"></link><id>http://www.levigross.com/</id><updated>2014-06-11T00:00:00+00:00</updated><entry><title>How to find XSS in Knockout.js applications</title><link href="http://www.levigross.com/2014/06/11/how-to-find-xss-in-knockoutjs-applications/" rel="alternate"></link><updated>2014-06-11T00:00:00+00:00</updated><author><name>Levi Gross</name></author><id>tag:www.levigross.com,2014-06-11:2014/06/11/how-to-find-xss-in-knockoutjs-applications/</id><summary type="html">&lt;p&gt;Knockout is an easy to use Javascript &lt;span class="caps"&gt;MVC&lt;/span&gt; framework. Honestly it is one of my favorite to work with. I find the barrier to entry to be minimal and it still packs quite a punch in&amp;nbsp;functionality.&lt;/p&gt;
+&lt;p&gt;Knockout works by making use of the &lt;code&gt;data-bind&lt;/code&gt; &lt;span class="caps"&gt;HTML&lt;/span&gt; tag attribute and replaces the contents of the tag&amp;nbsp;programmatically.&lt;/p&gt;
+&lt;p&gt;Below is a classic example of&amp;nbsp;Knockout.js&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;p&amp;gt;&lt;/span&gt;First name: &lt;span class="nt"&gt;&amp;lt;input&lt;/span&gt; &lt;span class="na"&gt;data-bind=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;value: firstName&amp;quot;&lt;/span&gt; &lt;span class="nt"&gt;/&amp;gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;p&amp;gt;&lt;/span&gt;Last name: &lt;span class="nt"&gt;&amp;lt;input&lt;/span&gt; &lt;span class="na"&gt;data-bind=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;value: lastName&amp;quot;&lt;/span&gt; &lt;span class="nt"&gt;/&amp;gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;h2&amp;gt;&lt;/span&gt;Hello, &lt;span class="nt"&gt;&amp;lt;span&lt;/span&gt; &lt;span class="na"&gt;data-bind=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;text: fullName&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt; &lt;span class="nt"&gt;&amp;lt;/span&amp;gt;&lt;/span&gt;!&lt;span class="nt"&gt;&amp;lt;/h2&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// Here&amp;#39;s my data model&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;ViewModel&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;first&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;last&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;firstName&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;ko&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;observable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;first&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;lastName&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;ko&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;observable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;last&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;fullName&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;ko&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;computed&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="c1"&gt;// Knockout tracks dependencies automatically. It knows that fullName depends on firstName and lastName,&lt;/span&gt;
+        &lt;span class="c1"&gt;// because these get called when evaluating fullName.&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;firstName&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot; &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;lastName&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+
+&lt;span class="nx"&gt;ko&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;applyBindings&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;ViewModel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Planet&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Earth&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;));&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This code is not vulnerable to &lt;span class="caps"&gt;XSS&lt;/span&gt; because the the text element is being&amp;nbsp;set.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;h2&amp;gt;&lt;/span&gt;Hello, &lt;span class="nt"&gt;&amp;lt;span&lt;/span&gt; &lt;span class="na"&gt;data-bind=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;text: fullName&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt; &lt;span class="nt"&gt;&amp;lt;/span&amp;gt;&lt;/span&gt;!&lt;span class="nt"&gt;&amp;lt;/h2&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Were this to be written&amp;nbsp;as&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;h2&amp;gt;&lt;/span&gt;Hello, &lt;span class="nt"&gt;&amp;lt;span&lt;/span&gt; &lt;span class="na"&gt;data-bind=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;html: fullName&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt; &lt;span class="nt"&gt;&amp;lt;/span&amp;gt;&lt;/span&gt;!&lt;span class="nt"&gt;&amp;lt;/h2&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It will be vulnerable. This is because &lt;code&gt;data-bind="html:"&lt;/code&gt; modifies the &lt;code&gt;element.innerHTML&lt;/code&gt; attribute if the tag allowing for &lt;span class="caps"&gt;HTML&lt;/span&gt; to be placed into the &lt;span class="caps"&gt;DOM&lt;/span&gt;. This &lt;span class="caps"&gt;HTML&lt;/span&gt; will be evaluated and&amp;nbsp;executed.&lt;/p&gt;
+&lt;p&gt;Here is a list of Knockout.js features that may be used as an &lt;span class="caps"&gt;XSS&lt;/span&gt; vector in your&amp;nbsp;application.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;data-bind&lt;/code&gt; will execute any statement that it is given. Here is some sample template code written that is vulnerable&amp;nbsp;&lt;span class="caps"&gt;XSS&lt;/span&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;p&amp;gt;&lt;/span&gt;First name: &lt;span class="nt"&gt;&amp;lt;input&lt;/span&gt; &lt;span class="na"&gt;data-bind=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;text: firstName-{{ user_defined_var }}&amp;quot;&lt;/span&gt; &lt;span class="nt"&gt;/&amp;gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Even if the user controlled variable is within a comment, Knockout.&lt;span class="caps"&gt;JS&lt;/span&gt; parses comments and will execute them if they start with &lt;code&gt;&amp;lt;!-- ko ... --&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c"&gt;&amp;lt;!-- ko if: {{ user_control_var }} --&amp;gt;&lt;/span&gt;
+&lt;span class="c"&gt;&amp;lt;!-- /ko --&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Adding user controlled data into the following &lt;code&gt;data-bind&lt;/code&gt; elements may make you susceptible to &lt;span class="caps"&gt;XSS&lt;/span&gt;&lt;ol&gt;
+&lt;li&gt;html&lt;/li&gt;
+&lt;li&gt;css&lt;/li&gt;
+&lt;li&gt;style&lt;/li&gt;
+&lt;li&gt;attr&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</summary></entry><entry><title>How to write an encrypt and decrypt API for data at rest in Node.JS</title><link href="http://www.levigross.com/2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-nodejs/" rel="alternate"></link><updated>2014-03-30T00:00:00+00:00</updated><author><name>Levi Gross</name></author><id>tag:www.levigross.com,2014-03-30:2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-nodejs/</id><summary type="html">&lt;p&gt;The following code can be used to encrypt data at rest using Node.&lt;span class="caps"&gt;JS&lt;/span&gt;. The snippet is self contained and should be slightly modified so that key generation doesn&amp;#8217;t happen every time the code is&amp;nbsp;executed.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="cm"&gt;/*&lt;/span&gt;
 &lt;span class="cm"&gt; Copyright 2014 Levi Gross. All Rights Reserved.&lt;/span&gt;
 
