@@ -1,5 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Über Dig</title><link href="http://www.levigross.com/" rel="alternate"></link><link href="http://www.levigross.com/feeds/all.atom.xml" rel="self"></link><id>http://www.levigross.com/</id><updated>2014-06-11T00:00:00+00:00</updated><entry><title>How to find XSS in Knockout.js applications</title><link href="http://www.levigross.com/2014/06/11/how-to-find-xss-in-knockoutjs-applications/" rel="alternate"></link><updated>2014-06-11T00:00:00+00:00</updated><author><name>Levi Gross</name></author><id>tag:www.levigross.com,2014-06-11:2014/06/11/how-to-find-xss-in-knockoutjs-applications/</id><summary type="html">&lt;p&gt;Knockout is an easy to use Javascript &lt;span class="caps"&gt;MVC&lt;/span&gt; framework. Honestly it is one of my favorite to work with. I find the barrier to entry to be minimal and it still packs quite a punch in&amp;nbsp;functionality.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Über Dig</title><link href="http://www.levigross.com/" rel="alternate"></link><link href="http://www.levigross.com/feeds/all.atom.xml" rel="self"></link><id>http://www.levigross.com/</id><updated>2014-07-04T00:00:00+00:00</updated><entry><title>Security Concerns With Python’s urllib and urllib2</title><link href="http://www.levigross.com/2014/07/04/security-concerns-with-pythons-urllib-and-urllib2/" rel="alternate"></link><updated>2014-07-04T00:00:00+00:00</updated><author><name>Levi Gross</name></author><id>tag:www.levigross.com,2014-07-04:2014/07/04/security-concerns-with-pythons-urllib-and-urllib2/</id><summary type="html">&lt;p&gt;Applications written in Python should not use &lt;code&gt;urllib&lt;/code&gt; and &lt;code&gt;urllib2&lt;/code&gt; for the following&amp;nbsp;reasons.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;External proxy support isn&amp;#8217;t trivial to implement, which usually means it isn&amp;#8217;t implemented at&amp;nbsp;all.&lt;/li&gt;
+&lt;li&gt;The urlopen functionality does not implement &lt;span class="caps"&gt;ANY&lt;/span&gt; &lt;span class="caps"&gt;SSL&lt;/span&gt;&amp;nbsp;verification.&lt;/li&gt;
+&lt;li&gt;Many types of &lt;span class="caps"&gt;URL&lt;/span&gt;&amp;#8217;s are supported, including&amp;nbsp;file://.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;For now lets focus on number&amp;nbsp;3.&lt;/p&gt;
+&lt;p&gt;It is commonly exploited with the following&amp;nbsp;code:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;urllib2&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;attacker_controlled_input&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;file:///etc/passwd&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;urllib2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;urlopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attacker_controlled_input&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you control attacker_controlled_input, you have as much control as if you had an &lt;span class="caps"&gt;XML&lt;/span&gt; &lt;span class="caps"&gt;XXE&lt;/span&gt; attack (arbitrary file read, DoS by read /dev/zero&amp;nbsp;etc..).&lt;/p&gt;
+&lt;p&gt;However, it is really important that you control the first part of the input. Without it, you would not be able to exploit this&amp;nbsp;functionality.&lt;/p&gt;
+&lt;p&gt;Now, say you control the first part of the input but something is being appended to that input&amp;nbsp;e.g:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;urllib2&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;attacker_controlled_data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;file:///etc/passwd&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;ext&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;.csv&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;urllib2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;urlopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attacker_controlled_data&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;ext&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You are stuck! While you would be able to read any .csv file on the system your lofty goal of /etc/passwd is not&amp;nbsp;obtainable!&lt;/p&gt;
+&lt;p&gt;You may be tempted to insert a &lt;span class="caps"&gt;NUL&lt;/span&gt; byte at the end of your input.&amp;nbsp;e.g&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;urllib2&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;attacker_controlled_data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;file:///etc/passwd%00&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;ext&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;.csv&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;urllib2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;urlopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attacker_controlled_data&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;ext&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;But Python does not let you open files with strings that have &lt;span class="caps"&gt;NUL&lt;/span&gt; bytes in them. It will throw the following&amp;nbsp;exception.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="ne"&gt;TypeError&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;must&lt;/span&gt; &lt;span class="n"&gt;be&lt;/span&gt; &lt;span class="n"&gt;encoded&lt;/span&gt; &lt;span class="n"&gt;string&lt;/span&gt; &lt;span class="n"&gt;without&lt;/span&gt; &lt;span class="n"&gt;&lt;span class="caps"&gt;NULL&lt;/span&gt;&lt;/span&gt; &lt;span class="nb"&gt;bytes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ow"&gt;not&lt;/span&gt; &lt;span class="nb"&gt;str&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Fear not! There is still hope. Lets take a step back and remember we are exploiting a &lt;span class="caps"&gt;URL&lt;/span&gt;&amp;nbsp;library.&lt;/p&gt;
+&lt;p&gt;&lt;span class="caps"&gt;URL&lt;/span&gt; libraries have to handle all types of URLs. While I will not go into an in-depth explanation of on &lt;span class="caps"&gt;URL&lt;/span&gt; construction. I will focus on one part, the &lt;span class="caps"&gt;URL&lt;/span&gt; fragment. A &lt;span class="caps"&gt;URL&lt;/span&gt; fragment is generally used by a browser to scroll to a specific location on the page (for more details please see the following Wikipedia article&amp;nbsp;http://en.wikipedia.org/wiki/Fragment_identifier).&lt;/p&gt;
+&lt;p&gt;However, they mean nothing to any &lt;span class="caps"&gt;URL&lt;/span&gt; fetching&amp;nbsp;library.&lt;/p&gt;
+&lt;p&gt;Making use of this knowledge, we can craft our payload to look like&amp;nbsp;this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;urllib2&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;attacker_controlled_data&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;file:///etc/passwd#&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;ext&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;.csv&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;urllib2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;urlopen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;attacker_controlled_data&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;ext&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And obtain the contents of &lt;code&gt;/etc/passwd&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;It is important to note that the above mentioned workaround doesn&amp;#8217;t work with &lt;code&gt;urllib&lt;/code&gt;, it only works with &lt;code&gt;urllib2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Have a good day and a wonderful independence&amp;nbsp;day!&lt;/p&gt;</summary></entry><entry><title>How to find XSS in Knockout.js applications</title><link href="http://www.levigross.com/2014/06/11/how-to-find-xss-in-knockoutjs-applications/" rel="alternate"></link><updated>2014-06-11T00:00:00+00:00</updated><author><name>Levi Gross</name></author><id>tag:www.levigross.com,2014-06-11:2014/06/11/how-to-find-xss-in-knockoutjs-applications/</id><summary type="html">&lt;p&gt;Knockout is an easy to use Javascript &lt;span class="caps"&gt;MVC&lt;/span&gt; framework. Honestly it is one of my favorite to work with. I find the barrier to entry to be minimal and it still packs quite a punch in&amp;nbsp;functionality.&lt;/p&gt;
 &lt;p&gt;Knockout works by making use of the &lt;code&gt;data-bind&lt;/code&gt; &lt;span class="caps"&gt;HTML&lt;/span&gt; tag attribute and replaces the contents of the tag&amp;nbsp;programmatically.&lt;/p&gt;
 &lt;p&gt;Below is a classic example of&amp;nbsp;Knockout.js&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;p&amp;gt;&lt;/span&gt;First name: &lt;span class="nt"&gt;&amp;lt;input&lt;/span&gt; &lt;span class="na"&gt;data-bind=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;value: firstName&amp;quot;&lt;/span&gt; &lt;span class="nt"&gt;/&amp;gt;&amp;lt;/p&amp;gt;&lt;/span&gt;

