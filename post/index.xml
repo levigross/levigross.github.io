@@ -240,8 +240,8 @@ var decrypt = function (cipher_text) {
     }
 
     decryptor = crypto.createDecipheriv(ALGORITHM, KEY, IV);
-    decryptor = decryptor.update(ct, &#39;hex&#39;, &#39;utf8&#39;);
-    return decryptor.final(&#39;utf-8&#39;)
+    decryptor.update(ct, &#39;hex&#39;, &#39;utf-8&#39;);
+    return decryptedText + decryptor.final(&#39;utf-8&#39;);
 
 
 };

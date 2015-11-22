@@ -167,8 +167,8 @@ var decrypt = function (cipher_text) {
     }
 
     decryptor = crypto.createDecipheriv(ALGORITHM, KEY, IV);
-    decryptor = decryptor.update(ct, 'hex', 'utf8');
-    return decryptor.final('utf-8')
+    decryptor.update(ct, 'hex', 'utf-8');
+    return decryptedText + decryptor.final('utf-8');
 
 
 };
