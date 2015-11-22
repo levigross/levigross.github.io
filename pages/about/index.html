@@ -3,20 +3,20 @@
 <head prefix="og: http://ogp.me/ns#">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <meta property="og:title" content=" Django Security Interview Questions &middot;  Making simple things extremely complex" />
+  <meta property="og:title" content=" About Levi Gross &middot;  Making simple things extremely complex" />
   
   <meta property="og:site_name" content="Making simple things extremely complex" />
-  <meta property="og:url" content="http://www.levigross.com/2014/02/07/django-security-interview-questions/" />
+  <meta property="og:url" content="http://www.levigross.com/pages/about/" />
   
   
   <meta property="og:type" content="article" />
   
-  <meta property="og:article:published_time" content="2014-02-07T21:47:50-05:00" />
+  <meta property="og:article:published_time" content="2015-11-21T21:12:12-05:00" />
   
   
 
   <title>
-     Django Security Interview Questions &middot;  Making simple things extremely complex
+     About Levi Gross &middot;  Making simple things extremely complex
   </title>
 
   <link rel="stylesheet" href="http://www.levigross.com/css/bootstrap.min.css" />
@@ -84,12 +84,12 @@
 
 <article>
   <header>
-    <h1 class="text-primary">Django Security Interview Questions</h1>
+    <h1 class="text-primary">About Levi Gross</h1>
     <div class="post-meta clearfix">
       <div class="post-date pull-left">
         Posted on
-        <time datetime="2014-02-07T21:47:50-05:00">
-          Feb 7, 2014
+        <time datetime="2015-11-21T21:12:12-05:00">
+          Nov 21, 2015
         </time>
       </div>
       <div class="pull-right">
@@ -98,54 +98,31 @@
     </div>
   </header>
   <section>
-    <p>I feel that every Django developer should know the answer to the questions below.</p>
+    
+
+<p>I&rsquo;m Levi Gross, a human living in Brooklyn.</p>
+
+<h2 id="where-i-work:6083a88ee3411b0d17ce02d738f69d47">Where I Work</h2>
 
 <ul>
-<li>What is wrong with the following template snippet?</li>
+<li><a href="http://www.genesys.com/">Genesys</a></li>
+<li><a href="http://www.newschool.edu/">The New School</a></li>
 </ul>
 
-<pre><code class="language-html">&lt;a href=&quot;http://www.google.com/&quot; class={{ user_class }} &gt;Google&lt;/a&gt;
-</code></pre>
+<h2 id="where-used-i-work:6083a88ee3411b0d17ce02d738f69d47">Where Used I Work</h2>
 
 <ul>
-<li>Identify the security vulnerability in the following code.  What is it? How can it be exploited?</li>
+<li><a href="http://www.matasano.com/">Matasano</a></li>
+<li><a href="http://www.axial.net/">Axial</a></li>
 </ul>
 
-<pre><code class="language-python">class CatViewer(TemplateView):
-    template_name = 'view_cats.html'
+<h2 id="contact-me:6083a88ee3411b0d17ce02d738f69d47">Contact Me</h2>
 
-    def post(self, request, *args, **kwargs):
-        form = CatViewForm(self.request.POST)
-        if not form.is_valid():
-            return self.get(request, form=form)
-        form.instance.cat_image = b64encode(urlopen(form.instance.picture_url).read())
-        form.save()
-        return redirect('cat_viewer')
+<p>Please feel free to send me an email <a href="mailto:levi@levigross.com">levi@levigross.com</a></p>
 
+<h3 id="notes:6083a88ee3411b0d17ce02d738f69d47">Notes</h3>
 
-    def get_context_data(self, **kwargs):
-        return {
-            'form': kwargs['form'] if 'form' in kwargs else CatViewForm(),
-            'cat_pics': CatView.objects.all(),
-        }
-</code></pre>
-
-<ul>
-<li>Provide ways to identify a Django application during a blackbox test?</li>
-<li>What is the default password hash algorithm that Django uses? Were there any recent changes?</li>
-<li>Given a Django settings file, which items would stand out (whether they are missing or not) and why?</li>
-<li>How does Django know to escape certain values?</li>
-<li>Are Django values &ldquo;safe&rdquo; when rendered in Javascript?</li>
-<li>Is it possible to execute a mass assignment attack against a Django model? If yes, how and when?</li>
-<li>What parts of Django are susceptible to SQL injection attacks and how does Django defend against these attacks?</li>
-<li>Why is the SECRET_KEY so important?</li>
-<li>When looking for a denial of service vector, which part of Django stands out as the most vulnerable?</li>
-<li>Is Django threadsafe? If not, how does this effect the security of the application?</li>
-<li>How does Django&rsquo;s permission model work? Is it effective?</li>
-<li>How does Django&rsquo;s file uploading functionality work? How would you make it more secure?</li>
-<li>How does Django deal with directory traversal vulnerabilities?</li>
-<li>How does Django deal with CSRF? Is it totally effective?</li>
-</ul>
+<p><em>This blog is a collection of my <em>personal</em> thoughts and does not represent the views of my employers&rsquo;, past, present, and future.</em></p>
 
   </section>
   <footer>
@@ -187,10 +164,10 @@
     </section>
     <ul class="pager">
       
-      <li class="previous"><a href="http://www.levigross.com/pages/reading-list/"><span aria-hidden="true">&larr;</span> Older</a></li>
+      <li class="previous"><a href="http://www.levigross.com/2015/11/21/migrating-to-hugo/"><span aria-hidden="true">&larr;</span> Older</a></li>
       
       
-      <li class="next"><a href="http://www.levigross.com/2014/02/07/constant-time-comparison-functions-in...-python-haskell-clojure-and-java/">Newer <span aria-hidden="true">&rarr;</span></a></li>
+      <li class="next disabled"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
       
     </ul>
   </footer>

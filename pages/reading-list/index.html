@@ -3,20 +3,20 @@
 <head prefix="og: http://ogp.me/ns#">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <meta property="og:title" content=" Django Security Interview Questions &middot;  Making simple things extremely complex" />
+  <meta property="og:title" content=" Reading List &middot;  Making simple things extremely complex" />
   
   <meta property="og:site_name" content="Making simple things extremely complex" />
-  <meta property="og:url" content="http://www.levigross.com/2014/02/07/django-security-interview-questions/" />
+  <meta property="og:url" content="http://www.levigross.com/pages/reading-list/" />
   
   
   <meta property="og:type" content="article" />
   
-  <meta property="og:article:published_time" content="2014-02-07T21:47:50-05:00" />
+  <meta property="og:article:published_time" content="2014-02-07T00:00:00Z" />
   
   
 
   <title>
-     Django Security Interview Questions &middot;  Making simple things extremely complex
+     Reading List &middot;  Making simple things extremely complex
   </title>
 
   <link rel="stylesheet" href="http://www.levigross.com/css/bootstrap.min.css" />
@@ -84,11 +84,11 @@
 
 <article>
   <header>
-    <h1 class="text-primary">Django Security Interview Questions</h1>
+    <h1 class="text-primary">Reading List</h1>
     <div class="post-meta clearfix">
       <div class="post-date pull-left">
         Posted on
-        <time datetime="2014-02-07T21:47:50-05:00">
+        <time datetime="2014-02-07T00:00:00Z">
           Feb 7, 2014
         </time>
       </div>
@@ -98,53 +98,30 @@
     </div>
   </header>
   <section>
-    <p>I feel that every Django developer should know the answer to the questions below.</p>
+    
+
+<p>Here is a list of books that I recommend. They have really helped me gain a better understanding, and I whole heartily recommend them.</p>
+
+<h1 id="django:46049c794a9829e53b0f15bbb4f2969a">Django</h1>
 
 <ul>
-<li>What is wrong with the following template snippet?</li>
+<li><a href="http://www.amazon.com/gp/product/1481879707/ref=as_li_ss_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1481879707&amp;linkCode=as2&amp;tag=jewelerslcom-20">2 Scoops of Django</a></li>
 </ul>
 
-<pre><code class="language-html">&lt;a href=&quot;http://www.google.com/&quot; class={{ user_class }} &gt;Google&lt;/a&gt;
-</code></pre>
+<h1 id="python:46049c794a9829e53b0f15bbb4f2969a">Python</h1>
 
 <ul>
-<li>Identify the security vulnerability in the following code.  What is it? How can it be exploited?</li>
+<li><a href="http://www.amazon.com/gp/product/1118290275/ref=as_li_ss_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1118290275&amp;linkCode=as2&amp;tag=jewelerslcom-20">Data Structures and Algorithms in Python</a></li>
+<li><a href="http://www.amazon.com/gp/product/0132678209/ref=as_li_ss_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0132678209&amp;linkCode=as2&amp;tag=jewelerslcom-20">Core Python Applications Programming (3rd Edition) (Core Series)</a></li>
+<li><a href="http://www.amazon.com/gp/product/0132269937/ref=as_li_ss_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0132269937&amp;linkCode=as2&amp;tag=jewelerslcom-20">Core Python Programming (2nd Edition)</a></li>
 </ul>
 
-<pre><code class="language-python">class CatViewer(TemplateView):
-    template_name = 'view_cats.html'
-
-    def post(self, request, *args, **kwargs):
-        form = CatViewForm(self.request.POST)
-        if not form.is_valid():
-            return self.get(request, form=form)
-        form.instance.cat_image = b64encode(urlopen(form.instance.picture_url).read())
-        form.save()
-        return redirect('cat_viewer')
-
-
-    def get_context_data(self, **kwargs):
-        return {
-            'form': kwargs['form'] if 'form' in kwargs else CatViewForm(),
-            'cat_pics': CatView.objects.all(),
-        }
-</code></pre>
+<h1 id="general-development:46049c794a9829e53b0f15bbb4f2969a">General Development</h1>
 
 <ul>
-<li>Provide ways to identify a Django application during a blackbox test?</li>
-<li>What is the default password hash algorithm that Django uses? Were there any recent changes?</li>
-<li>Given a Django settings file, which items would stand out (whether they are missing or not) and why?</li>
-<li>How does Django know to escape certain values?</li>
-<li>Are Django values &ldquo;safe&rdquo; when rendered in Javascript?</li>
-<li>Is it possible to execute a mass assignment attack against a Django model? If yes, how and when?</li>
-<li>What parts of Django are susceptible to SQL injection attacks and how does Django defend against these attacks?</li>
-<li>Why is the SECRET_KEY so important?</li>
-<li>When looking for a denial of service vector, which part of Django stands out as the most vulnerable?</li>
-<li>Is Django threadsafe? If not, how does this effect the security of the application?</li>
-<li>How does Django&rsquo;s permission model work? Is it effective?</li>
-<li>How does Django&rsquo;s file uploading functionality work? How would you make it more secure?</li>
-<li>How does Django deal with directory traversal vulnerabilities?</li>
-<li>How does Django deal with CSRF? Is it totally effective?</li>
+<li><a href="http://www.amazon.com/gp/product/020161622X/ref=as_li_ss_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=020161622X&amp;linkCode=as2&amp;tag=jewelerslcom-20">The Pragmatic Programmer: From Journeyman to Master</a></li>
+<li><a href="http://www.amazon.com/gp/product/020161586X/ref=as_li_ss_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=020161586X&amp;linkCode=as2&amp;tag=jewelerslcom-20">The Practice of Programming (Addison-Wesley Professional Computing Series)</a></li>
+<li><a href="http://www.amazon.com/gp/product/0201835959/ref=as_li_ss_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=0201835959&amp;linkCode=as2&amp;tag=jewelerslcom-20">The Mythical Man-Month: Essays on Software Engineering</a></li>
 </ul>
 
   </section>
@@ -187,10 +164,10 @@
     </section>
     <ul class="pager">
       
-      <li class="previous"><a href="http://www.levigross.com/pages/reading-list/"><span aria-hidden="true">&larr;</span> Older</a></li>
+      <li class="previous"><a href="http://www.levigross.com/2014/01/01/37-tips-for-interviewing-a-tech-company/"><span aria-hidden="true">&larr;</span> Older</a></li>
       
       
-      <li class="next"><a href="http://www.levigross.com/2014/02/07/constant-time-comparison-functions-in...-python-haskell-clojure-and-java/">Newer <span aria-hidden="true">&rarr;</span></a></li>
+      <li class="next"><a href="http://www.levigross.com/2014/02/07/django-security-interview-questions/">Newer <span aria-hidden="true">&rarr;</span></a></li>
       
     </ul>
   </footer>

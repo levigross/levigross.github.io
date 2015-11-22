@@ -3,20 +3,20 @@
 <head prefix="og: http://ogp.me/ns#">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <meta property="og:title" content=" Django Security Interview Questions &middot;  Making simple things extremely complex" />
+  <meta property="og:title" content=" How to write an encrypt and decrypt API for data at rest in Node.JS &middot;  Making simple things extremely complex" />
   
   <meta property="og:site_name" content="Making simple things extremely complex" />
-  <meta property="og:url" content="http://www.levigross.com/2014/02/07/django-security-interview-questions/" />
+  <meta property="og:url" content="http://www.levigross.com/2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-node.js/" />
   
   
   <meta property="og:type" content="article" />
   
-  <meta property="og:article:published_time" content="2014-02-07T21:47:50-05:00" />
+  <meta property="og:article:published_time" content="2014-03-30T21:48:00-05:00" />
   
   
 
   <title>
-     Django Security Interview Questions &middot;  Making simple things extremely complex
+     How to write an encrypt and decrypt API for data at rest in Node.JS &middot;  Making simple things extremely complex
   </title>
 
   <link rel="stylesheet" href="http://www.levigross.com/css/bootstrap.min.css" />
@@ -84,12 +84,12 @@
 
 <article>
   <header>
-    <h1 class="text-primary">Django Security Interview Questions</h1>
+    <h1 class="text-primary">How to write an encrypt and decrypt API for data at rest in Node.JS</h1>
     <div class="post-meta clearfix">
       <div class="post-date pull-left">
         Posted on
-        <time datetime="2014-02-07T21:47:50-05:00">
-          Feb 7, 2014
+        <time datetime="2014-03-30T21:48:00-05:00">
+          Mar 30, 2014
         </time>
       </div>
       <div class="pull-right">
@@ -98,54 +98,105 @@
     </div>
   </header>
   <section>
-    <p>I feel that every Django developer should know the answer to the questions below.</p>
+    <p>The following code can be used to encrypt data at rest using Node.JS. The snippet is self contained and should be slightly modified so that key generation doesn&rsquo;t happen every time the code is executed.</p>
 
-<ul>
-<li>What is wrong with the following template snippet?</li>
-</ul>
+<pre><code class="language-javascript">/*
+ Copyright 2014 Levi Gross. All Rights Reserved.
 
-<pre><code class="language-html">&lt;a href=&quot;http://www.google.com/&quot; class={{ user_class }} &gt;Google&lt;/a&gt;
+ Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ */
+
+
+var crypto, ALGORITHM, KEY, HMAC_ALGORITHM, HMAC_KEY;
+
+crypto = require('crypto');
+
+ALGORITHM = 'AES-256-CBC'; // CBC because CTR isn't possible with the current version of the Node.JS crypto library
+HMAC_ALGORITHM = 'SHA256';
+KEY = crypto.randomBytes(32); // This key should be stored in an environment variable
+HMAC_KEY = crypto.randomBytes(32); // This key should be stored in an environment variable
+
+var encrypt = function (plain_text) {
+
+    var IV = new Buffer(crypto.randomBytes(16)); // ensure that the IV (initialization vector) is random
+    var cipher_text;
+    var hmac;
+    var encryptor;
+
+    encryptor = crypto.createCipheriv(ALGORITHM, KEY, IV);
+    encryptor.setEncoding('hex');
+    encryptor.write(plain_text);
+    encryptor.end();
+
+    cipher_text = encryptor.read();
+
+    hmac = crypto.createHmac(HMAC_ALGORITHM, HMAC_KEY);
+    hmac.update(cipher_text);
+    hmac.update(IV.toString('hex')); // ensure that both the IV and the cipher-text is protected by the HMAC
+
+    // The IV isn't a secret so it can be stored along side everything else
+    return cipher_text + &quot;$&quot; + IV.toString('hex') + &quot;$&quot; + hmac.digest('hex') 
+
+};
+
+var decrypt = function (cipher_text) {
+    var cipher_blob = cipher_text.split(&quot;$&quot;);
+    var ct = cipher_blob[0];
+    var IV = new Buffer(cipher_blob[1], 'hex');
+    var hmac = cipher_blob[2];
+    var decryptor;
+
+    chmac = crypto.createHmac(HMAC_ALGORITHM, HMAC_KEY);
+    chmac.update(ct);
+    chmac.update(IV.toString('hex'));
+
+    if (!constant_time_compare(chmac.digest('hex'), hmac)) {
+        console.log(&quot;Encrypted Blob has been tampered with...&quot;);
+        return null;
+    }
+
+    decryptor = crypto.createDecipheriv(ALGORITHM, KEY, IV);
+    decryptor = decryptor.update(ct, 'hex', 'utf8');
+    return decryptor.final('utf-8')
+
+
+};
+
+var constant_time_compare = function (val1, val2) {
+    var sentinel;
+
+    if (val1.length !== val2.length) {
+        return false;
+    }
+
+
+    for (var i = 0; i &lt;= (val1.length - 1); i++) {
+        sentinel |= val1.charCodeAt(i) ^ val2.charCodeAt(i);
+    }
+
+    return sentinel === 0
+};
+
 </code></pre>
 
-<ul>
-<li>Identify the security vulnerability in the following code.  What is it? How can it be exploited?</li>
-</ul>
+<p>Now you have some clear crypto APIs. Here is an example of them being used.</p>
 
-<pre><code class="language-python">class CatViewer(TemplateView):
-    template_name = 'view_cats.html'
-
-    def post(self, request, *args, **kwargs):
-        form = CatViewForm(self.request.POST)
-        if not form.is_valid():
-            return self.get(request, form=form)
-        form.instance.cat_image = b64encode(urlopen(form.instance.picture_url).read())
-        form.save()
-        return redirect('cat_viewer')
-
-
-    def get_context_data(self, **kwargs):
-        return {
-            'form': kwargs['form'] if 'form' in kwargs else CatViewForm(),
-            'cat_pics': CatView.objects.all(),
-        }
+<pre><code class="language-javascript">var blob = encrypt(&quot;FOO&quot;);
+console.log(blob);
+var unblob = decrypt(blob);
+console.log(unblob);
 </code></pre>
-
-<ul>
-<li>Provide ways to identify a Django application during a blackbox test?</li>
-<li>What is the default password hash algorithm that Django uses? Were there any recent changes?</li>
-<li>Given a Django settings file, which items would stand out (whether they are missing or not) and why?</li>
-<li>How does Django know to escape certain values?</li>
-<li>Are Django values &ldquo;safe&rdquo; when rendered in Javascript?</li>
-<li>Is it possible to execute a mass assignment attack against a Django model? If yes, how and when?</li>
-<li>What parts of Django are susceptible to SQL injection attacks and how does Django defend against these attacks?</li>
-<li>Why is the SECRET_KEY so important?</li>
-<li>When looking for a denial of service vector, which part of Django stands out as the most vulnerable?</li>
-<li>Is Django threadsafe? If not, how does this effect the security of the application?</li>
-<li>How does Django&rsquo;s permission model work? Is it effective?</li>
-<li>How does Django&rsquo;s file uploading functionality work? How would you make it more secure?</li>
-<li>How does Django deal with directory traversal vulnerabilities?</li>
-<li>How does Django deal with CSRF? Is it totally effective?</li>
-</ul>
 
   </section>
   <footer>
@@ -187,10 +238,10 @@
     </section>
     <ul class="pager">
       
-      <li class="previous"><a href="http://www.levigross.com/pages/reading-list/"><span aria-hidden="true">&larr;</span> Older</a></li>
+      <li class="previous"><a href="http://www.levigross.com/2014/03/13/spot-the-vulnerability-within-this-program/"><span aria-hidden="true">&larr;</span> Older</a></li>
       
       
-      <li class="next"><a href="http://www.levigross.com/2014/02/07/constant-time-comparison-functions-in...-python-haskell-clojure-and-java/">Newer <span aria-hidden="true">&rarr;</span></a></li>
+      <li class="next"><a href="http://www.levigross.com/2014/06/11/how-to-find-xss-in-knockout.js-applications/">Newer <span aria-hidden="true">&rarr;</span></a></li>
       
     </ul>
   </footer>

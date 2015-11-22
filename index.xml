@@ -1,0 +1,821 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Making simple things extremely complex</title>
+    <link>http://www.levigross.com/</link>
+    <description>Recent content on Making simple things extremely complex</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; Levi Gross</copyright>
+    <lastBuildDate>Sat, 21 Nov 2015 21:12:12 -0500</lastBuildDate>
+    <atom:link href="http://www.levigross.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>About Levi Gross</title>
+      <link>http://www.levigross.com/pages/about/</link>
+      <pubDate>Sat, 21 Nov 2015 21:12:12 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/pages/about/</guid>
+      <description>
+
+&lt;p&gt;I&amp;rsquo;m Levi Gross, a human living in Brooklyn.&lt;/p&gt;
+
+&lt;h2 id=&#34;where-i-work:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Where I Work&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.genesys.com/&#34;&gt;Genesys&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.newschool.edu/&#34;&gt;The New School&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;where-used-i-work:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Where Used I Work&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.matasano.com/&#34;&gt;Matasano&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.axial.net/&#34;&gt;Axial&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;contact-me:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Contact Me&lt;/h2&gt;
+
+&lt;p&gt;Please feel free to send me an email &lt;a href=&#34;mailto:levi@levigross.com&#34;&gt;levi@levigross.com&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;notes:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Notes&lt;/h3&gt;
+
+&lt;p&gt;&lt;em&gt;This blog is a collection of my &lt;em&gt;personal&lt;/em&gt; thoughts and does not represent the views of my employers&amp;rsquo;, past, present, and future.&lt;/em&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Migrating to Hugo</title>
+      <link>http://www.levigross.com/2015/11/21/migrating-to-hugo/</link>
+      <pubDate>Sat, 21 Nov 2015 20:50:59 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/2015/11/21/migrating-to-hugo/</guid>
+      <description>&lt;p&gt;I am moving my blog to Hugo because I cannot constantly refactoring my old blog. Hopefully, Hugo will be better.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Security Concerns With Python&#39;s urllib and urllib2</title>
+      <link>http://www.levigross.com/2014/07/04/security-concerns-with-pythons-urllib-and-urllib2/</link>
+      <pubDate>Fri, 04 Jul 2014 21:41:07 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/2014/07/04/security-concerns-with-pythons-urllib-and-urllib2/</guid>
+      <description>&lt;p&gt;Applications written in Python should not use &lt;code&gt;urllib&lt;/code&gt; and &lt;code&gt;urllib2&lt;/code&gt; for the following reasons.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;External proxy support isn&amp;rsquo;t trivial to implement, which usually means it isn&amp;rsquo;t implemented at all.&lt;/li&gt;
+&lt;li&gt;The urlopen functionality does not implement ANY SSL verification.&lt;/li&gt;
+&lt;li&gt;Many types of URL&amp;rsquo;s are supported, including file://.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;For now lets focus on number 3.&lt;/p&gt;
+
+&lt;p&gt;It is commonly exploited with the following code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; import urllib2
+&amp;gt;&amp;gt;&amp;gt; attacker_controlled_input = &amp;quot;file:///etc/passwd&amp;quot;
+&amp;gt;&amp;gt;&amp;gt; print urllib2.urlopen(attacker_controlled_input).read()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you control attacker_controlled_input, you have as much control as if you had an XML XXE attack (arbitrary file read, DoS by read /dev/zero etc..).&lt;/p&gt;
+
+&lt;p&gt;However, it is really important that you control the first part of the input. Without it, you would not be able to exploit this functionality.&lt;/p&gt;
+
+&lt;p&gt;Now, say you control the first part of the input but something is being appended to that input e.g:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; import urllib2
+&amp;gt;&amp;gt;&amp;gt; attacker_controlled_data = &amp;quot;file:///etc/passwd&amp;quot;
+&amp;gt;&amp;gt;&amp;gt; ext = &amp;quot;.csv&amp;quot;
+&amp;gt;&amp;gt;&amp;gt; print urllib2.urlopen(attacker_controlled_data + ext).read()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You are stuck! While you would be able to read any .csv file on the system your lofty goal of /etc/passwd is not obtainable!&lt;/p&gt;
+
+&lt;p&gt;You may be tempted to insert a NUL byte at the end of your input. e.g&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; import urllib2
+&amp;gt;&amp;gt;&amp;gt; attacker_controlled_data = &amp;quot;file:///etc/passwd%00&amp;quot;
+&amp;gt;&amp;gt;&amp;gt; ext = &amp;quot;.csv&amp;quot;
+&amp;gt;&amp;gt;&amp;gt; print urllib2.urlopen(attacker_controlled_data + ext).read()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But Python does not let you open files with strings that have NUL bytes in them. It will throw the following exception.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;TypeError: must be encoded string without NULL bytes, not str
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Fear not! There is still hope. Lets take a step back and remember we are exploiting a URL library.&lt;/p&gt;
+
+&lt;p&gt;URL libraries have to handle all types of URLs. While I will not go into an in-depth explanation of on URL construction. I will focus on one part, the URL fragment. A URL fragment is generally used by a browser to scroll to a specific location on the page (for more information please see the following Wikipedia article &lt;a href=&#34;http://en.wikipedia.org/wiki/Fragment_identifier&#34;&gt;http://en.wikipedia.org/wiki/Fragment_identifier&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;However, they mean nothing to any URL fetching library.&lt;/p&gt;
+
+&lt;p&gt;Making use of this knowledge, we can craft our payload to look like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;&amp;gt;&amp;gt;&amp;gt; import urllib2
+&amp;gt;&amp;gt;&amp;gt; attacker_controlled_data = &amp;quot;file:///etc/passwd#&amp;quot;
+&amp;gt;&amp;gt;&amp;gt; ext = &amp;quot;.csv&amp;quot;
+&amp;gt;&amp;gt;&amp;gt; print urllib2.urlopen(attacker_controlled_data + ext).read()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And obtain the contents of &lt;code&gt;/etc/passwd&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;It is important to note that the above mentioned workaround doesn&amp;rsquo;t work with &lt;code&gt;urllib&lt;/code&gt;, it only works with &lt;code&gt;urllib2&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Have a good day and a wonderful independence day!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>How to find XSS in Knockout.js Applications</title>
+      <link>http://www.levigross.com/2014/06/11/how-to-find-xss-in-knockout.js-applications/</link>
+      <pubDate>Wed, 11 Jun 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.levigross.com/2014/06/11/how-to-find-xss-in-knockout.js-applications/</guid>
+      <description>&lt;p&gt;Knockout is an easy to use Javascript MVC framework. Honestly it is one of my favorite to work with. I find the barrier to entry to be minimal and it still packs quite a punch in functionality.&lt;/p&gt;
+
+&lt;p&gt;Knockout works by making use of the &lt;code&gt;data-bind&lt;/code&gt; HTML tag attribute and replaces the contents of the tag programmatically.&lt;/p&gt;
+
+&lt;p&gt;Below is a classic example of Knockout.js&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;p&amp;gt;First name: &amp;lt;input data-bind=&amp;quot;value: firstName&amp;quot; /&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;p&amp;gt;Last name: &amp;lt;input data-bind=&amp;quot;value: lastName&amp;quot; /&amp;gt;&amp;lt;/p&amp;gt;
+&amp;lt;h2&amp;gt;Hello, &amp;lt;span data-bind=&amp;quot;text: fullName&amp;quot;&amp;gt; &amp;lt;/span&amp;gt;!&amp;lt;/h2&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;// Here&#39;s my data model
+var ViewModel = function(first, last) {
+    this.firstName = ko.observable(first);
+    this.lastName = ko.observable(last);
+
+    this.fullName = ko.computed(function() {
+        // Knockout tracks dependencies automatically. It knows that fullName depends on firstName and lastName,
+        // because these get called when evaluating fullName.
+        return this.firstName() + &amp;quot; &amp;quot; + this.lastName();
+    }, this);
+};
+
+ko.applyBindings(new ViewModel(&amp;quot;Planet&amp;quot;, &amp;quot;Earth&amp;quot;));
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This code is not vulnerable to XSS because the text element is being set.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;h2&amp;gt;Hello, &amp;lt;span data-bind=&amp;quot;text: fullName&amp;quot;&amp;gt; &amp;lt;/span&amp;gt;!&amp;lt;/h2&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Were this to be written as&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;h2&amp;gt;Hello, &amp;lt;span data-bind=&amp;quot;html: fullName&amp;quot;&amp;gt; &amp;lt;/span&amp;gt;!&amp;lt;/h2&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It will be vulnerable. This is because &lt;code&gt;data-bind=&amp;quot;html:&amp;quot;&lt;/code&gt; modifies the &lt;code&gt;element.innerHTML&lt;/code&gt; attribute if the tag allowing for HTML to be placed into the DOM. This HTML will be evaluated and executed.&lt;/p&gt;
+
+&lt;p&gt;Here is a list of Knockout.js features that may be used as an XSS vector in your application.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;data-bind&lt;/code&gt; will execute any statement that it is given. Here is some sample template code written that is vulnerable XSS.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;p&amp;gt;First name: &amp;lt;input data-bind=&amp;quot;text: firstName-{{ user_defined_var }}&amp;quot; /&amp;gt;&amp;lt;/p&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Even if the user controlled variable is within a comment, Knockout.JS parses comments and will execute them if they start with &lt;code&gt;&amp;lt;!-- ko ... --&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- ko if: {{ user_control_var }} --&amp;gt;
+&amp;lt;!-- /ko --&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Adding user controlled data into the following &lt;code&gt;data-bind&lt;/code&gt; elements may make you susceptible to XSS
+
+&lt;ol&gt;
+&lt;li&gt;html&lt;/li&gt;
+&lt;li&gt;css&lt;/li&gt;
+&lt;li&gt;style&lt;/li&gt;
+&lt;li&gt;attr&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>How to write an encrypt and decrypt API for data at rest in Node.JS</title>
+      <link>http://www.levigross.com/2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-node.js/</link>
+      <pubDate>Sun, 30 Mar 2014 21:48:00 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-node.js/</guid>
+      <description>&lt;p&gt;The following code can be used to encrypt data at rest using Node.JS. The snippet is self contained and should be slightly modified so that key generation doesn&amp;rsquo;t happen every time the code is executed.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;/*
+ Copyright 2014 Levi Gross. All Rights Reserved.
+
+ Licensed under the Apache License, Version 2.0 (the &amp;quot;License&amp;quot;);
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an &amp;quot;AS IS&amp;quot; BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ */
+
+
+var crypto, ALGORITHM, KEY, HMAC_ALGORITHM, HMAC_KEY;
+
+crypto = require(&#39;crypto&#39;);
+
+ALGORITHM = &#39;AES-256-CBC&#39;; // CBC because CTR isn&#39;t possible with the current version of the Node.JS crypto library
+HMAC_ALGORITHM = &#39;SHA256&#39;;
+KEY = crypto.randomBytes(32); // This key should be stored in an environment variable
+HMAC_KEY = crypto.randomBytes(32); // This key should be stored in an environment variable
+
+var encrypt = function (plain_text) {
+
+    var IV = new Buffer(crypto.randomBytes(16)); // ensure that the IV (initialization vector) is random
+    var cipher_text;
+    var hmac;
+    var encryptor;
+
+    encryptor = crypto.createCipheriv(ALGORITHM, KEY, IV);
+    encryptor.setEncoding(&#39;hex&#39;);
+    encryptor.write(plain_text);
+    encryptor.end();
+
+    cipher_text = encryptor.read();
+
+    hmac = crypto.createHmac(HMAC_ALGORITHM, HMAC_KEY);
+    hmac.update(cipher_text);
+    hmac.update(IV.toString(&#39;hex&#39;)); // ensure that both the IV and the cipher-text is protected by the HMAC
+
+    // The IV isn&#39;t a secret so it can be stored along side everything else
+    return cipher_text + &amp;quot;$&amp;quot; + IV.toString(&#39;hex&#39;) + &amp;quot;$&amp;quot; + hmac.digest(&#39;hex&#39;) 
+
+};
+
+var decrypt = function (cipher_text) {
+    var cipher_blob = cipher_text.split(&amp;quot;$&amp;quot;);
+    var ct = cipher_blob[0];
+    var IV = new Buffer(cipher_blob[1], &#39;hex&#39;);
+    var hmac = cipher_blob[2];
+    var decryptor;
+
+    chmac = crypto.createHmac(HMAC_ALGORITHM, HMAC_KEY);
+    chmac.update(ct);
+    chmac.update(IV.toString(&#39;hex&#39;));
+
+    if (!constant_time_compare(chmac.digest(&#39;hex&#39;), hmac)) {
+        console.log(&amp;quot;Encrypted Blob has been tampered with...&amp;quot;);
+        return null;
+    }
+
+    decryptor = crypto.createDecipheriv(ALGORITHM, KEY, IV);
+    decryptor = decryptor.update(ct, &#39;hex&#39;, &#39;utf8&#39;);
+    return decryptor.final(&#39;utf-8&#39;)
+
+
+};
+
+var constant_time_compare = function (val1, val2) {
+    var sentinel;
+
+    if (val1.length !== val2.length) {
+        return false;
+    }
+
+
+    for (var i = 0; i &amp;lt;= (val1.length - 1); i++) {
+        sentinel |= val1.charCodeAt(i) ^ val2.charCodeAt(i);
+    }
+
+    return sentinel === 0
+};
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now you have some clear crypto APIs. Here is an example of them being used.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;var blob = encrypt(&amp;quot;FOO&amp;quot;);
+console.log(blob);
+var unblob = decrypt(blob);
+console.log(unblob);
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title> Spot the vulnerability within this program</title>
+      <link>http://www.levigross.com/2014/03/13/spot-the-vulnerability-within-this-program/</link>
+      <pubDate>Thu, 13 Mar 2014 21:40:08 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/2014/03/13/spot-the-vulnerability-within-this-program/</guid>
+      <description>
+
+&lt;p&gt;I wrote some code today to extract ZipFiles in Go. The code includes a security issue, can you spot it?&lt;/p&gt;
+
+&lt;h2 id=&#34;not-for-use-in-a-real-environment:77cc7e1fe0e15093e7b4bd6b71b76b71&#34;&gt;Not for use in a real environment!&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import (
+	&amp;quot;archive/zip&amp;quot;
+	&amp;quot;flag&amp;quot;
+	&amp;quot;fmt&amp;quot;
+	&amp;quot;io&amp;quot;
+	&amp;quot;log&amp;quot;
+	&amp;quot;os&amp;quot;
+	&amp;quot;path&amp;quot;
+	&amp;quot;path/filepath&amp;quot;
+)
+
+var file_name = flag.String(&amp;quot;file_name&amp;quot;,
+	&amp;quot;&amp;quot;, &amp;quot;This is the zip file that you wish to extract&amp;quot;)
+
+func main() {
+	flag.Parse()
+
+	if *file_name == &amp;quot;&amp;quot; {
+		log.Fatal(&amp;quot;Please enter a valid zipfile that you wish to extract&amp;quot;)
+	}
+
+	r, err := zip.OpenReader(*file_name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer r.Close()
+
+	current_dir, _ := os.Getwd()
+
+	done := make(chan bool, 1)
+	count := 0
+
+	for _, f := range r.File {
+		count++
+		go ExtractArchive(current_dir, f, done)
+	}
+	for count &amp;gt; 0 {
+		select {
+		case &amp;lt;-done:
+			count--
+		}
+	}
+
+}
+
+func ExtractArchive(current_directory string,
+	archive_file *zip.File, done chan bool) {
+	// Ensure that we can open the file
+	in, err := archive_file.Open()
+	if err != nil {
+		log.Fatal(&amp;quot;Unable to open part of zip archive&amp;quot;, err)
+	}
+	defer in.Close()
+
+	file_info := archive_file.FileInfo()
+
+	// Is it a directory? If so create the directory and return
+	if file_info.IsDir() {
+		os.MkdirAll(filepath.Join(current_directory,
+			path.Clean(archive_file.Name)), file_info.Mode())
+		done &amp;lt;- true
+		return
+	}
+
+	file_name := filepath.Join(current_directory, path.Clean(archive_file.Name))
+	out, err := os.Create(file_name)
+
+	fmt.Printf(&amp;quot;\t Inflating contents of %s\n&amp;quot;, archive_file.Name)
+	defer out.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if _, err = io.Copy(out, in); err != nil {
+		log.Println(err)
+		return
+
+	}
+	out.Sync()
+	done &amp;lt;- true
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Constant Time Comparison Functions in... Python, Haskell, Clojure, and Java </title>
+      <link>http://www.levigross.com/2014/02/07/constant-time-comparison-functions-in...-python-haskell-clojure-and-java/</link>
+      <pubDate>Fri, 07 Feb 2014 21:48:08 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/2014/02/07/constant-time-comparison-functions-in...-python-haskell-clojure-and-java/</guid>
+      <description>
+
+&lt;p&gt;Here is a list of constant time comparison functions to protect yourself against side-channel timing attacks.&lt;/p&gt;
+
+&lt;h2 id=&#34;clojure:bb8d5498cb02d5013bd159e25feee6d2&#34;&gt;Clojure&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; Taken from https://github.com/weavejester/crypto-equality/blob/master/src/crypto/equality.clj
+ 
+(ns crypto.equality
+  &amp;quot;Securely test sequences of data for equality.&amp;quot;)
+ 
+(defn eq?
+  &amp;quot;Test whether two sequences of characters or bytes are equal in a way that
+  protects against timing attacks. Note that this does not prevent an attacker
+  from discovering the *length* of the data being compared.&amp;quot;
+  [a b]
+  (let [a (map int a), b (map int b)]
+    (if (and a b (= (count a) (count b)))
+      (zero? (reduce bit-or (map bit-xor a b)))
+      false)))
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;python-2-x:bb8d5498cb02d5013bd159e25feee6d2&#34;&gt;Python 2.x&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#Taken from Django Source Code
+ 
+def constant_time_compare(val1, val2):
+    &amp;quot;&amp;quot;&amp;quot;
+    Returns True if the two strings are equal, False otherwise.
+ 
+    The time taken is independent of the number of characters that match.
+ 
+    For the sake of simplicity, this function executes in constant time only
+    when the two strings have the same length. It short-circuits when they
+    have different lengths.
+    &amp;quot;&amp;quot;&amp;quot;
+    if len(val1) != len(val2):
+        return False
+    result = 0
+    for x, y in zip(val1, val2):
+        result |= ord(x) ^ ord(y)
+    return result == 0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;python-3-x:bb8d5498cb02d5013bd159e25feee6d2&#34;&gt;Python 3.x&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;#This is included within the stdlib in Py3k for an C alternative for Python 2.7.x see https://github.com/levigross/constant_time_compare/
+from operator import _compare_digest as constant_time_compare
+ 
+# Or you can use this function taken from Django Source Code
+ 
+def constant_time_compare(val1, val2):
+    &amp;quot;&amp;quot;&amp;quot;
+    Returns True if the two strings are equal, False otherwise.
+ 
+    The time taken is independent of the number of characters that match.
+ 
+    For the sake of simplicity, this function executes in constant time only
+    when the two strings have the same length. It short-circuits when they
+    have different lengths.
+    &amp;quot;&amp;quot;&amp;quot;
+    if len(val1) != len(val2):
+        return False
+    result = 0
+    for x, y in zip(val1, val2):
+        result |= x ^ y
+    return result == 0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;haskell:bb8d5498cb02d5013bd159e25feee6d2&#34;&gt;Haskell&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;import Data.Bits
+import Data.Char
+import Data.List
+import Data.Function
+ 
+-- Thank you Yan for this snippet 
+ 
+constantTimeCompare a b =
+  ((==) `on` length) a b &amp;amp;&amp;amp; 0 == (foldl1 (.|.) joined)
+  where
+    joined = zipWith (xor `on` ord) a b
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;java:bb8d5498cb02d5013bd159e25feee6d2&#34;&gt;Java&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;// Taken from http://codahale.com/a-lesson-in-timing-attacks/
+public static boolean isEqual(byte[] a, byte[] b) {
+    if (a.length != b.length) {
+        return false;
+    }
+ 
+    int result = 0;
+    for (int i = 0; i &amp;lt; a.length; i++) {
+      result |= a[i] ^ b[i]
+    }
+    return result == 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;ruby:bb8d5498cb02d5013bd159e25feee6d2&#34;&gt;Ruby&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;def secure_compare(a, b)
+     return false if a.empty? || b.empty? || a.bytesize != b.bytesize
+     l = a.unpack &amp;quot;C#{a.bytesize}&amp;quot;
+ 
+     res = 0
+     b.each_byte { |byte| res |= byte ^ l.shift }
+     res == 0
+   end
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I have added all of these to a &lt;a href=&#34;https://gist.github.com/levigross/8691015&#34;&gt;Github Gist&lt;/a&gt; to make it easier to clone.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Django Security Interview Questions</title>
+      <link>http://www.levigross.com/2014/02/07/django-security-interview-questions/</link>
+      <pubDate>Fri, 07 Feb 2014 21:47:50 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/2014/02/07/django-security-interview-questions/</guid>
+      <description>&lt;p&gt;I feel that every Django developer should know the answer to the questions below.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;What is wrong with the following template snippet?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;a href=&amp;quot;http://www.google.com/&amp;quot; class={{ user_class }} &amp;gt;Google&amp;lt;/a&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Identify the security vulnerability in the following code.  What is it? How can it be exploited?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;class CatViewer(TemplateView):
+    template_name = &#39;view_cats.html&#39;
+
+    def post(self, request, *args, **kwargs):
+        form = CatViewForm(self.request.POST)
+        if not form.is_valid():
+            return self.get(request, form=form)
+        form.instance.cat_image = b64encode(urlopen(form.instance.picture_url).read())
+        form.save()
+        return redirect(&#39;cat_viewer&#39;)
+
+
+    def get_context_data(self, **kwargs):
+        return {
+            &#39;form&#39;: kwargs[&#39;form&#39;] if &#39;form&#39; in kwargs else CatViewForm(),
+            &#39;cat_pics&#39;: CatView.objects.all(),
+        }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Provide ways to identify a Django application during a blackbox test?&lt;/li&gt;
+&lt;li&gt;What is the default password hash algorithm that Django uses? Were there any recent changes?&lt;/li&gt;
+&lt;li&gt;Given a Django settings file, which items would stand out (whether they are missing or not) and why?&lt;/li&gt;
+&lt;li&gt;How does Django know to escape certain values?&lt;/li&gt;
+&lt;li&gt;Are Django values &amp;ldquo;safe&amp;rdquo; when rendered in Javascript?&lt;/li&gt;
+&lt;li&gt;Is it possible to execute a mass assignment attack against a Django model? If yes, how and when?&lt;/li&gt;
+&lt;li&gt;What parts of Django are susceptible to SQL injection attacks and how does Django defend against these attacks?&lt;/li&gt;
+&lt;li&gt;Why is the SECRET_KEY so important?&lt;/li&gt;
+&lt;li&gt;When looking for a denial of service vector, which part of Django stands out as the most vulnerable?&lt;/li&gt;
+&lt;li&gt;Is Django threadsafe? If not, how does this effect the security of the application?&lt;/li&gt;
+&lt;li&gt;How does Django&amp;rsquo;s permission model work? Is it effective?&lt;/li&gt;
+&lt;li&gt;How does Django&amp;rsquo;s file uploading functionality work? How would you make it more secure?&lt;/li&gt;
+&lt;li&gt;How does Django deal with directory traversal vulnerabilities?&lt;/li&gt;
+&lt;li&gt;How does Django deal with CSRF? Is it totally effective?&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Reading List</title>
+      <link>http://www.levigross.com/pages/reading-list/</link>
+      <pubDate>Fri, 07 Feb 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.levigross.com/pages/reading-list/</guid>
+      <description>
+
+&lt;p&gt;Here is a list of books that I recommend. They have really helped me gain a better understanding, and I whole heartily recommend them.&lt;/p&gt;
+
+&lt;h1 id=&#34;django:46049c794a9829e53b0f15bbb4f2969a&#34;&gt;Django&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/1481879707/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=1481879707&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;2 Scoops of Django&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;python:46049c794a9829e53b0f15bbb4f2969a&#34;&gt;Python&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/1118290275/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=1118290275&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;Data Structures and Algorithms in Python&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/0132678209/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0132678209&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;Core Python Applications Programming (3rd Edition) (Core Series)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/0132269937/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0132269937&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;Core Python Programming (2nd Edition)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;general-development:46049c794a9829e53b0f15bbb4f2969a&#34;&gt;General Development&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/020161622X/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=020161622X&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;The Pragmatic Programmer: From Journeyman to Master&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/020161586X/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=020161586X&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;The Practice of Programming (Addison-Wesley Professional Computing Series)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/0201835959/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0201835959&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;The Mythical Man-Month: Essays on Software Engineering&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>37 tips for interviewing a tech company</title>
+      <link>http://www.levigross.com/2014/01/01/37-tips-for-interviewing-a-tech-company/</link>
+      <pubDate>Wed, 01 Jan 2014 21:47:03 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/2014/01/01/37-tips-for-interviewing-a-tech-company/</guid>
+      <description>
+
+&lt;p&gt;This is a list of things that &lt;em&gt;&lt;em&gt;I&lt;/em&gt;&lt;/em&gt; look out for when joining companies that I don&amp;rsquo;t know much about. You may not agree with everything listed here. I welcome your feedback and counter arguments.&lt;/p&gt;
+
+&lt;h2 id=&#34;what-to-avoid:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;What to avoid&lt;/h2&gt;
+
+&lt;h3 id=&#34;1-avoid-companies-that-are-obsessed-with-a-specific-technology-stack-unless-you-are-as-well:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;1. Avoid companies that are &lt;em&gt;obsessed&lt;/em&gt; with a specific technology stack (unless you are as well)&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s face it, technology stacks are a means to an end. Focusing on the technology instead of the solution is a recipe for disaster. Specific technology stacks are not guarantees for success and therefore should not be obsessed over.&lt;/p&gt;
+
+&lt;h3 id=&#34;2-avoid-companies-with-excessive-technical-debt:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;2. Avoid companies with excessive technical debt&lt;/h3&gt;
+
+&lt;p&gt;This must be balanced with what is mentioned above. If the company allows their employees &lt;em&gt;total&lt;/em&gt; freedom in adding to the technical stack, you should steer clear. A company&amp;rsquo;s &lt;a href=&#34;http://en.wikipedia.org/wiki/Bus_factor&#34;&gt;Bus Factor&lt;/a&gt; is very important. No one wants to spend a weekend learning some arcane system, because the person that maintained it has left the company and a new critical bug was just discovered.&lt;/p&gt;
+
+&lt;h3 id=&#34;3-avoid-companies-where-the-people-who-are-conducting-the-interview-look-overworked:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;3.  Avoid companies where the people who are conducting the interview look overworked&lt;/h3&gt;
+
+&lt;p&gt;If the employees look overworked, if you join you will be overworked as well.&lt;/p&gt;
+
+&lt;h3 id=&#34;4-avoid-companies-that-will-not-be-able-to-tell-you-what-your-initial-workload-will-look-like:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;4. Avoid companies that will not be able to tell you what your initial workload will look like&lt;/h3&gt;
+
+&lt;p&gt;When you join a company, the company should have a somewhat accurate estimate of what your initial workload should look like (at least for the first 3-6 months). Avoid places that don&amp;rsquo;t.&lt;/p&gt;
+
+&lt;h3 id=&#34;5-avoid-companies-that-seriously-affect-your-quality-of-life:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;5.  Avoid companies that seriously affect your quality of life&lt;/h3&gt;
+
+&lt;p&gt;Your quality of life is important, and you should be assertive in ensuring that your new job won&amp;rsquo;t have a detrimental effect on it. I can &lt;strong&gt;guarantee&lt;/strong&gt; that a company doesn&amp;rsquo;t care how many all nighters you pull to get the job done. All they care about is how to effectively make use of their &lt;em&gt;human capital&lt;/em&gt; and will squeeze you for all your worth. Your job requires your full mental capacity, which requires that you maintain a certain quality of life.&lt;/p&gt;
+
+&lt;h3 id=&#34;6-if-you-are-offered-a-higher-salary-in-exchange-for-less-equity-take-the-higher-salary:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;6.  If you are offered a higher salary in exchange for less equity, take the higher salary.&lt;/h3&gt;
+
+&lt;p&gt;Equity rarely amounts to anything significant. Many times it is used to pacify overworked employees. Take the extra cash today. This only applies if you cannot sell the equity on an exchange.&lt;/p&gt;
+
+&lt;h3 id=&#34;7-avoid-companies-that-do-not-have-an-official-ramp-up-process:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;7. Avoid companies that do not have an official ramp-up process&lt;/h3&gt;
+
+&lt;p&gt;Every employee, no matter how senior, must learn how things work at every company they join. Your initial days will require a lot of &amp;ldquo;hand holding&amp;rdquo; and help. This is normal. Avoid places that throw you into the lion&amp;rsquo;s den with a dull knife.&lt;/p&gt;
+
+&lt;h3 id=&#34;8-avoid-companies-that-have-even-one-brogrammer-http-www-urbandictionary-com-define-php-term-brogrammer:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;8. Avoid companies that have even &lt;em&gt;one&lt;/em&gt; &lt;a href=&#34;http://www.urbandictionary.com/define.php?term=brogrammer&#34;&gt;brogrammer&lt;/a&gt;&lt;/h3&gt;
+
+&lt;p&gt;Remember, even &lt;em&gt;one&lt;/em&gt; bad employee can ruin the environment for everyone.&lt;/p&gt;
+
+&lt;h3 id=&#34;9-avoid-companies-with-immature-and-childish-employees:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;9. Avoid companies with immature and childish employees&lt;/h3&gt;
+
+&lt;p&gt;You want to work in a place where people are respectful and mature. Otherwise, office drama will play a serious part of your work day.&lt;/p&gt;
+
+&lt;h3 id=&#34;10-avoid-companies-with-conceited-people:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;10. Avoid companies with conceited people&lt;/h3&gt;
+
+&lt;p&gt;No one wants to be around conceited people, let alone work with them.&lt;/p&gt;
+
+&lt;h3 id=&#34;11-avoid-companies-that-shun-diversity:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;11. Avoid companies that shun diversity&lt;/h3&gt;
+
+&lt;p&gt;You want to work at places that embrace diversity. Remember, everyone will feel welcome in a place that embraces diversity.&lt;/p&gt;
+
+&lt;h3 id=&#34;12-avoid-places-that-don-t-respect-you-or-your-property:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;12. Avoid places that don&amp;rsquo;t respect you or your property&lt;/h3&gt;
+
+&lt;p&gt;This can be interpreted in many ways and I will leave this up to the reader&amp;rsquo;s intuition. However, I will provide one example. If your company expects you to use your cellphone as a part of your job, they should at least pay &lt;strong&gt;some&lt;/strong&gt; if not your entire cellphone bill (in addition to your current salary) or provide you with a company cellphone.&lt;/p&gt;
+
+&lt;h3 id=&#34;13-avoid-companies-that-lack-a-systematic-processes:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;13. Avoid companies that lack a systematic processes&lt;/h3&gt;
+
+&lt;p&gt;Processes and policies allow companies to scale. A lack of some form of standardization will lead to all sorts of technical and logistical debt.&lt;/p&gt;
+
+&lt;h3 id=&#34;14-avoid-companies-with-no-office-culture:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;14. Avoid companies with no office culture&lt;/h3&gt;
+
+&lt;p&gt;Every company, big and small should have some form of office culture. You want to work in a friendly environment and be on good terms with your co-workers. Many of these relationships can be fostered at company events.  A company that lacks culture, lacks harmony.&lt;/p&gt;
+
+&lt;h3 id=&#34;15-avoid-companies-that-have-unwelcome-surprises-during-the-interview:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;15. Avoid companies that have unwelcome surprises during the interview&lt;/h3&gt;
+
+&lt;p&gt;If you experience an unwelcome surprise during the interview, imagine how many &amp;ldquo;surprises&amp;rdquo; you will experience during your employment.&lt;/p&gt;
+
+&lt;h3 id=&#34;16-avoid-companies-that-ask-useless-interview-questions:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;16. Avoid companies that ask useless interview questions&lt;/h3&gt;
+
+&lt;p&gt;If you are asked questions that are not relevant to the job you are interviewing for, decline to answer them. Here is an example of a useless interview question.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;How many traffic lights are there in New York City?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;17-avoid-companies-that-ask-you-to-contribute-to-their-code-base-during-the-interview-process:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;17. Avoid companies that ask you to contribute to their code base during the interview process&lt;/h3&gt;
+
+&lt;p&gt;You are being interviewed and have not been hired. You should not be working on the company&amp;rsquo;s code base during your interview.&lt;/p&gt;
+
+&lt;h3 id=&#34;18-avoid-companies-that-ask-you-to-take-a-large-amount-of-time-off-of-work-to-interview-without-compensating-you:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;18. Avoid companies that ask you to take a large amount of time off of work to interview without compensating you&lt;/h3&gt;
+
+&lt;p&gt;A company should respect the time that the interview candidates takes to come in to interview. If they ask you to take a day or two off to interview, it should compensate you &lt;strong&gt;monetarily&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;19-avoid-companies-that-do-not-have-a-code-of-ethics:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;19. Avoid companies that do not have a code of ethics&lt;/h3&gt;
+
+&lt;p&gt;A code of ethics is very important and every company should possess one. Avoid places that don&amp;rsquo;t.&lt;/p&gt;
+
+&lt;h3 id=&#34;20-avoid-companies-with-an-unlimited-paid-vacation-policy:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;20. Avoid companies with an unlimited paid vacation policy&lt;/h3&gt;
+
+&lt;p&gt;This is a nice way of saying &amp;ldquo;The company vacation &lt;em&gt;policy&lt;/em&gt; is subject to our discretion on a case by case basis&amp;rdquo;. Knowing how much paid vacation you are entitled to allows you to plan your vacation and not have to worry if you&amp;rsquo;re asking for too much.&lt;/p&gt;
+
+&lt;h3 id=&#34;21-avoid-companies-with-questionable-business-practices:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;21. Avoid companies with questionable business practices&lt;/h3&gt;
+
+&lt;p&gt;If the company you are interviewing by may be breaking the law or doing something &lt;em&gt;you&lt;/em&gt; deem unethical, walk away.&lt;/p&gt;
+
+&lt;h3 id=&#34;22-avoid-companies-with-individual-ownership-requirements:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;22. Avoid companies with individual ownership requirements&lt;/h3&gt;
+
+&lt;p&gt;All new and current systems should be owned by the engineering team. You don&amp;rsquo;t want to be the &lt;em&gt;only&lt;/em&gt; one on call for everything &lt;em&gt;you&lt;/em&gt; build. It leads to a culture where people are afraid to innovate in fear of losing their nights and weekends.&lt;/p&gt;
+
+&lt;h3 id=&#34;23-avoid-companies-that-force-you-to-use-your-personal-social-media-accounts-for-company-advertisements:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;23. Avoid companies that &lt;em&gt;force&lt;/em&gt; you to use your &lt;em&gt;personal&lt;/em&gt; social media accounts for company advertisements&lt;/h3&gt;
+
+&lt;p&gt;It is fine for a company to &lt;em&gt;ask&lt;/em&gt; you to post company announcements or job listings on your social media accounts. It is not OK for them to force you.&lt;/p&gt;
+
+&lt;h3 id=&#34;24-avoid-companies-with-a-high-turn-over-rate:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;24. Avoid companies with a high turn over rate&lt;/h3&gt;
+
+&lt;p&gt;If a company cannot retain employees, there is a good reason for it.&lt;/p&gt;
+
+&lt;h3 id=&#34;25-avoid-companies-that-are-not-a-meritocracy:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;25. Avoid companies that are not a meritocracy&lt;/h3&gt;
+
+&lt;p&gt;If a company doesn&amp;rsquo;t show appreciation for the hard work their employees put in, it doesn&amp;rsquo;t deserve the employees working for them and you shouldn&amp;rsquo;t join. And no, mugs and tee-shirts aren&amp;rsquo;t considered merit based monetary raises and bonuses!&lt;/p&gt;
+
+&lt;h2 id=&#34;questions-to-ask-during-your-interview:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;Questions to ask during your interview&lt;/h2&gt;
+
+&lt;h3 id=&#34;26-obtain-very-specific-information-about-the-company-s-employee-benefits-package:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;26. Obtain very specific information about the company&amp;rsquo;s employee benefits package&lt;/h3&gt;
+
+&lt;p&gt;Many companies offer benefit packages. Make sure you get a very clear picture of what is included, in particular: health, dental and vision benefits. A better benefits package can sometimes trump a higher salary. Here is an incomplete list of questions you should ask about a company&amp;rsquo;s benefit package:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Which insurance company provides the medical, dental, vision plans?&lt;/li&gt;
+&lt;li&gt;What are the plan names?&lt;/li&gt;
+&lt;li&gt;Can you please send me a copy of the medical, dental, and vision plans?&lt;/li&gt;
+&lt;li&gt;Can you please send me a complete list of all of the benefits provided?&lt;/li&gt;
+&lt;li&gt;How long after joining the company do the medical, dental, and vision begin?&lt;/li&gt;
+&lt;li&gt;Are there any limits or caveats that I should know about?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;27-obtain-very-specific-information-about-the-companies-tech-stack:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;27. Obtain very specific information about the companies tech stack&lt;/h3&gt;
+
+&lt;p&gt;Reverse interview the employees about the work they do and the technology they use. Feel free to ask them about every detail, no matter how insignificant it may seem. This will show you at least 3 things:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;How well the current employees understand the stack that they are using.&lt;/li&gt;
+&lt;li&gt;The technical debt that you will be dealing with (should you decide to join).&lt;/li&gt;
+&lt;li&gt;If they make sane technical decisions.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;28-ask-the-employees-to-tell-you-something-they-don-t-like-about-their-current-job:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;28. Ask the employees to tell you something they don&amp;rsquo;t like about their current job&lt;/h3&gt;
+
+&lt;p&gt;This is very important. Familiarity breeds contempt, and how employees answer this question will tell you a lot about the company.&lt;/p&gt;
+
+&lt;h3 id=&#34;29-look-at-glassdoor-com-http-www-glassdoor-com-before-you-go-in-for-an-interview:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;29. Look at &lt;a href=&#34;http://www.glassdoor.com/&#34;&gt;GlassDoor.com&lt;/a&gt; before you go in for an interview&lt;/h3&gt;
+
+&lt;p&gt;GlassDoor.com can give you some insight into company internals; make use of it.&lt;/p&gt;
+
+&lt;h3 id=&#34;30-reach-out-to-former-employees-and-ask-them-about-their-experience:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;30. Reach out to former employees and ask them about their experience&lt;/h3&gt;
+
+&lt;p&gt;Be polite and don&amp;rsquo;t be pushy. Let them know you are considering joining company XYZ and you would like to hear about their experiences at XYZ  company. Their insight can provide invaluable information on whether or not you should join XYZ company.&lt;/p&gt;
+
+&lt;h3 id=&#34;31-identify-a-list-of-reasons-you-would-like-to-join-the-company-and-validate-those-reasons:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;31. Identify a list of reasons you would like to join the company and validate those reasons&lt;/h3&gt;
+
+&lt;p&gt;Say you want to join XYZ Inc because they use Python. During the interview ask how and when they use Python. Ensure that the company&amp;rsquo;s use of Python is what you are looking for. Knowing what you are getting into is very important.&lt;/p&gt;
+
+&lt;h3 id=&#34;32-if-the-company-has-public-code-on-github-look-it-over:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;32. If the company has public code on GitHub, look it over&lt;/h3&gt;
+
+&lt;p&gt;Every company has their own engineering process. When a company publishes code, they are usually proud of it. This is one of the best ways to gauge the engineering process within a company.&lt;/p&gt;
+
+&lt;h3 id=&#34;33-find-something-technical-to-criticize-and-politely-mention-it-during-the-interview:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;33. Find something technical to criticize and &lt;em&gt;&lt;em&gt;politely&lt;/em&gt;&lt;/em&gt; mention it during the interview&lt;/h3&gt;
+
+&lt;p&gt;Dealing with criticism is an important part of every job, especially technical jobs. Being mature when accepting both valid and invalid criticism is very important.&lt;/p&gt;
+
+&lt;p&gt;Additionally, you should gauge the response. If you don&amp;rsquo;t like the response or the way that they deal with the critique, walk away.&lt;/p&gt;
+
+&lt;h3 id=&#34;34-if-you-interview-with-the-ceo-of-the-company-question-as-if-you-were-looking-to-invest-in-the-company:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;34. If you interview with the CEO of the company, question as if you were looking to invest in the company&lt;/h3&gt;
+
+&lt;p&gt;When you work for a company, you&amp;rsquo;re throwing your lot with the company&amp;rsquo;s lot. Make sure the company is making sound business decisions. Here is an incomplete list of questions you should ask the company&amp;rsquo;s CEO.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;What do you feel are the biggest challenges the business will face within the next 6 months?&lt;/li&gt;
+&lt;li&gt;What is your plan to overcome those challenges?&lt;/li&gt;
+&lt;li&gt;What were the biggest challenges that the business overcame in the past 6 months?&lt;/li&gt;
+&lt;li&gt;How do you measure success?&lt;/li&gt;
+&lt;li&gt;How does the company measure success?&lt;/li&gt;
+&lt;li&gt;What systems/mechanisms are in place to help ensure that (a) everyone in the company knows how the company is doing, and (b) someone with questions or concerns can raise them and receive a reasoned and thorough response?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&#34;35-speak-with-the-employees-of-the-company-at-meetups:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;35. Speak with the employees of the company at meetups&lt;/h3&gt;
+
+&lt;p&gt;You may learn things that are not mentioned during the interview and/or you may meet an employee whom you did not interview with. This can also help you gain insight into other parts of the company.&lt;/p&gt;
+
+&lt;h3 id=&#34;36-try-to-understand-the-company-s-recent-history:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;36. Try to understand the company&amp;rsquo;s recent history&lt;/h3&gt;
+
+&lt;p&gt;If the company just underwent some big changes, find out what was changed, why it was changed, how it was changed, and what the desired effect was on the company or team&amp;rsquo;s process/performance.&lt;/p&gt;
+
+&lt;h3 id=&#34;37-obtain-a-clear-list-of-expectations-for-the-job-for-which-you-are-interviewing:fac9454ab0bd27175de5f48e48baec8a&#34;&gt;37. Obtain a Clear List of Expectations for the Job for which you are Interviewing&lt;/h3&gt;
+
+&lt;p&gt;Gauge whether you feel that expectations are excessive. It will also help you negotiate a higher salary should they be excessive.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

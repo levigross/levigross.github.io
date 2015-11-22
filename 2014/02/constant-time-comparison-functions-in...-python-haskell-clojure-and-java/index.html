@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head prefix="og: http://ogp.me/ns#">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <meta property="og:title" content=" Constant Time Comparison Functions in... Python, Haskell, Clojure, and Java  &middot;  Making simple things extremely complex" />
+  
+  <meta property="og:site_name" content="Making simple things extremely complex" />
+  <meta property="og:url" content="http://localhost:1313/2014/02/constant-time-comparison-functions-in...-python-haskell-clojure-and-java/" />
+  
+  
+  <meta property="og:type" content="article" />
+  
+  <meta property="og:article:published_time" content="2014-02-07T21:48:08-05:00" />
+  
+  
+
+  <title>
+     Constant Time Comparison Functions in... Python, Haskell, Clojure, and Java  &middot;  Making simple things extremely complex
+  </title>
+
+  <link rel="stylesheet" href="http://localhost:1313/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="http://localhost:1313/css/main.css" />
+  <link rel="stylesheet" href="http://localhost:1313/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="http://localhost:1313/css/github.css" />
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400" type="text/css">
+  <link rel="shortcut icon" href="http://localhost:1313/images/favicon.ico" />
+  <link rel="apple-touch-icon" href="http://localhost:1313/images/apple-touch-icon.png" />
+  
+</head>
+<body>
+    <header class="global-header"  style="background-image:url( /images/bg.jpg )">
+    <section class="header-text">
+      <h1><a href="http://localhost:1313/">Making simple things extremely complex</a></h1>
+      
+      <div class="tag-line">
+        Or trying very hard to...
+      </div>
+      
+      <div class="sns-links hidden-print">
+  
+  <a href="mailto:levi@levigross.com">
+    <i class="fa fa-envelope"></i>
+  </a>
+  
+  
+  <a href="https://twitter.com/levigross" target="_blank">
+    <i class="fa fa-twitter"></i>
+  </a>
+  
+  
+  
+  
+  
+  <a href="https://github.com/levigross" target="_blank">
+    <i class="fa fa-github"></i>
+  </a>
+  
+  
+  
+  <a href="https://linkedin.com/in/levigross7" target="_blank">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="/pages/about/">
+    <i class="fa fa-user"></i>
+  </a>
+  
+</div>
+
+      
+      <a href="http://localhost:1313/" class="btn-header btn-back hidden-xs">
+        <i class="fa fa-angle-left" aria-hidden="true"></i>
+        &nbsp;Home
+      </a>
+      
+      
+    </section>
+  </header>
+  <main class="container">
+
+
+<article>
+  <header>
+    <h1 class="text-primary">Constant Time Comparison Functions in... Python, Haskell, Clojure, and Java </h1>
+    <div class="post-meta clearfix">
+      <div class="post-date pull-left">
+        Posted on
+        <time datetime="2014-02-07T21:48:08-05:00">
+          Feb 7, 2014
+        </time>
+      </div>
+      <div class="pull-right">
+        
+      </div>
+    </div>
+  </header>
+  <section>
+    
+
+<p>Here is a list of constant time comparison functions to protect yourself against side-channel timing attacks.</p>
+
+<h2 id="clojure:bb8d5498cb02d5013bd159e25feee6d2">Clojure</h2>
+
+<pre><code class="language-clojure">; Taken from https://github.com/weavejester/crypto-equality/blob/master/src/crypto/equality.clj
+ 
+(ns crypto.equality
+  &quot;Securely test sequences of data for equality.&quot;)
+ 
+(defn eq?
+  &quot;Test whether two sequences of characters or bytes are equal in a way that
+  protects against timing attacks. Note that this does not prevent an attacker
+  from discovering the *length* of the data being compared.&quot;
+  [a b]
+  (let [a (map int a), b (map int b)]
+    (if (and a b (= (count a) (count b)))
+      (zero? (reduce bit-or (map bit-xor a b)))
+      false)))
+
+</code></pre>
+
+<h2 id="python-2-x:bb8d5498cb02d5013bd159e25feee6d2">Python 2.x</h2>
+
+<pre><code class="language-python">#Taken from Django Source Code
+ 
+def constant_time_compare(val1, val2):
+    &quot;&quot;&quot;
+    Returns True if the two strings are equal, False otherwise.
+ 
+    The time taken is independent of the number of characters that match.
+ 
+    For the sake of simplicity, this function executes in constant time only
+    when the two strings have the same length. It short-circuits when they
+    have different lengths.
+    &quot;&quot;&quot;
+    if len(val1) != len(val2):
+        return False
+    result = 0
+    for x, y in zip(val1, val2):
+        result |= ord(x) ^ ord(y)
+    return result == 0
+</code></pre>
+
+<h2 id="python-3-x:bb8d5498cb02d5013bd159e25feee6d2">Python 3.x</h2>
+
+<pre><code class="language-python">#This is included within the stdlib in Py3k for an C alternative for Python 2.7.x see https://github.com/levigross/constant_time_compare/
+from operator import _compare_digest as constant_time_compare
+ 
+# Or you can use this function taken from Django Source Code
+ 
+def constant_time_compare(val1, val2):
+    &quot;&quot;&quot;
+    Returns True if the two strings are equal, False otherwise.
+ 
+    The time taken is independent of the number of characters that match.
+ 
+    For the sake of simplicity, this function executes in constant time only
+    when the two strings have the same length. It short-circuits when they
+    have different lengths.
+    &quot;&quot;&quot;
+    if len(val1) != len(val2):
+        return False
+    result = 0
+    for x, y in zip(val1, val2):
+        result |= x ^ y
+    return result == 0
+</code></pre>
+
+<h2 id="haskell:bb8d5498cb02d5013bd159e25feee6d2">Haskell</h2>
+
+<pre><code class="language-haskell">import Data.Bits
+import Data.Char
+import Data.List
+import Data.Function
+ 
+-- Thank you Yan for this snippet 
+ 
+constantTimeCompare a b =
+  ((==) `on` length) a b &amp;&amp; 0 == (foldl1 (.|.) joined)
+  where
+    joined = zipWith (xor `on` ord) a b
+</code></pre>
+
+<h2 id="java:bb8d5498cb02d5013bd159e25feee6d2">Java</h2>
+
+<pre><code class="language-java">// Taken from http://codahale.com/a-lesson-in-timing-attacks/
+public static boolean isEqual(byte[] a, byte[] b) {
+    if (a.length != b.length) {
+        return false;
+    }
+ 
+    int result = 0;
+    for (int i = 0; i &lt; a.length; i++) {
+      result |= a[i] ^ b[i]
+    }
+    return result == 0;
+}
+</code></pre>
+
+<h2 id="ruby:bb8d5498cb02d5013bd159e25feee6d2">Ruby</h2>
+
+<pre><code class="language-ruby">def secure_compare(a, b)
+     return false if a.empty? || b.empty? || a.bytesize != b.bytesize
+     l = a.unpack &quot;C#{a.bytesize}&quot;
+ 
+     res = 0
+     b.each_byte { |byte| res |= byte ^ l.shift }
+     res == 0
+   end
+
+</code></pre>
+
+<p>I have added all of these to a <a href="https://gist.github.com/levigross/8691015">Github Gist</a> to make it easier to clone.</p>
+
+  </section>
+  <footer>
+    
+    <hr/>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_shortname = 'levigross';
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    
+    <section class="author-info row">
+      <div class="author-avatar col-md-2">
+        
+        <img alt="Author Avatar" src="/img/james.jpeg" />
+        
+      </div>
+      <div class="author-meta col-md-6">
+        
+        <h1 class="author-name text-primary">Levi Gross</h1>
+        
+        
+        <div class="author-bio">Human living in Brooklyn, NYC</div>
+        
+      </div>
+      
+      <div class="author-contact col-md-4">
+        <a href="mailto:levi@levigross.com">
+          <i class="fa fa-envelope-o" aria-hidden="true"></i>
+          &nbsp;Contact me
+        </a>
+      </div>
+      
+    </section>
+    <ul class="pager">
+      
+      <li class="previous"><a href="http://localhost:1313/2014/02/django-security-interview-questions/"><span aria-hidden="true">&larr;</span> Older</a></li>
+      
+      
+      <li class="next"><a href="http://localhost:1313/2014/03/spot-the-vulnerability-within-this-program/">Newer <span aria-hidden="true">&rarr;</span></a></li>
+      
+    </ul>
+  </footer>
+</article>
+
+  </main>
+  <footer class="container global-footer">
+    <div class="copyright-note pull-left">
+      &copy; Levi Gross
+    </div>
+    <div class="sns-links hidden-print">
+  
+  <a href="mailto:levi@levigross.com">
+    <i class="fa fa-envelope"></i>
+  </a>
+  
+  
+  <a href="https://twitter.com/levigross" target="_blank">
+    <i class="fa fa-twitter"></i>
+  </a>
+  
+  
+  
+  
+  
+  <a href="https://github.com/levigross" target="_blank">
+    <i class="fa fa-github"></i>
+  </a>
+  
+  
+  
+  <a href="https://linkedin.com/in/levigross7" target="_blank">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="/pages/about/">
+    <i class="fa fa-user"></i>
+  </a>
+  
+</div>
+
+  </footer>
+
+  <script src="http://localhost:1313/js/highlight.pack.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-19381157-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  
+  
+<script data-no-instant>document.write('<script src="http://'
+        + (location.host || 'localhost').split(':')[0]
+		+ ':1313/livereload.js?mindelay=10"></'
+        + 'script>')</script></body>
+</html>
+

@@ -3,10 +3,10 @@
 <head prefix="og: http://ogp.me/ns#">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-  <meta property="og:title" content=" Django Security Interview Questions &middot;  Making simple things extremely complex" />
+  <meta property="og:title" content=" django security interview questions &middot;  Making simple things extremely complex" />
   
   <meta property="og:site_name" content="Making simple things extremely complex" />
-  <meta property="og:url" content="http://www.levigross.com/2014/02/07/django-security-interview-questions/" />
+  <meta property="og:url" content="http://localhost:1313/2014/02/django-security-interview-questions/" />
   
   
   <meta property="og:type" content="article" />
@@ -16,22 +16,22 @@
   
 
   <title>
-     Django Security Interview Questions &middot;  Making simple things extremely complex
+     django security interview questions &middot;  Making simple things extremely complex
   </title>
 
-  <link rel="stylesheet" href="http://www.levigross.com/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="http://www.levigross.com/css/main.css" />
-  <link rel="stylesheet" href="http://www.levigross.com/css/font-awesome.min.css" />
-  <link rel="stylesheet" href="http://www.levigross.com/css/github.css" />
+  <link rel="stylesheet" href="http://localhost:1313/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="http://localhost:1313/css/main.css" />
+  <link rel="stylesheet" href="http://localhost:1313/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="http://localhost:1313/css/github.css" />
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400" type="text/css">
-  <link rel="shortcut icon" href="http://www.levigross.com/images/favicon.ico" />
-  <link rel="apple-touch-icon" href="http://www.levigross.com/images/apple-touch-icon.png" />
+  <link rel="shortcut icon" href="http://localhost:1313/images/favicon.ico" />
+  <link rel="apple-touch-icon" href="http://localhost:1313/images/apple-touch-icon.png" />
   
 </head>
 <body>
     <header class="global-header"  style="background-image:url( /images/bg.jpg )">
     <section class="header-text">
-      <h1><a href="http://www.levigross.com/">Making simple things extremely complex</a></h1>
+      <h1><a href="http://localhost:1313/">Making simple things extremely complex</a></h1>
       
       <div class="tag-line">
         Or trying very hard to...
@@ -64,14 +64,14 @@
   
   
   
-  <a href="http://www.levigross.com/pages/about/">
+  <a href="/pages/about/">
     <i class="fa fa-user"></i>
   </a>
   
 </div>
 
       
-      <a href="http://www.levigross.com/" class="btn-header btn-back hidden-xs">
+      <a href="http://localhost:1313/" class="btn-header btn-back hidden-xs">
         <i class="fa fa-angle-left" aria-hidden="true"></i>
         &nbsp;Home
       </a>
@@ -84,7 +84,7 @@
 
 <article>
   <header>
-    <h1 class="text-primary">Django Security Interview Questions</h1>
+    <h1 class="text-primary">django security interview questions</h1>
     <div class="post-meta clearfix">
       <div class="post-date pull-left">
         Posted on
@@ -98,55 +98,7 @@
     </div>
   </header>
   <section>
-    <p>I feel that every Django developer should know the answer to the questions below.</p>
-
-<ul>
-<li>What is wrong with the following template snippet?</li>
-</ul>
-
-<pre><code class="language-html">&lt;a href=&quot;http://www.google.com/&quot; class={{ user_class }} &gt;Google&lt;/a&gt;
-</code></pre>
-
-<ul>
-<li>Identify the security vulnerability in the following code.  What is it? How can it be exploited?</li>
-</ul>
-
-<pre><code class="language-python">class CatViewer(TemplateView):
-    template_name = 'view_cats.html'
-
-    def post(self, request, *args, **kwargs):
-        form = CatViewForm(self.request.POST)
-        if not form.is_valid():
-            return self.get(request, form=form)
-        form.instance.cat_image = b64encode(urlopen(form.instance.picture_url).read())
-        form.save()
-        return redirect('cat_viewer')
-
-
-    def get_context_data(self, **kwargs):
-        return {
-            'form': kwargs['form'] if 'form' in kwargs else CatViewForm(),
-            'cat_pics': CatView.objects.all(),
-        }
-</code></pre>
-
-<ul>
-<li>Provide ways to identify a Django application during a blackbox test?</li>
-<li>What is the default password hash algorithm that Django uses? Were there any recent changes?</li>
-<li>Given a Django settings file, which items would stand out (whether they are missing or not) and why?</li>
-<li>How does Django know to escape certain values?</li>
-<li>Are Django values &ldquo;safe&rdquo; when rendered in Javascript?</li>
-<li>Is it possible to execute a mass assignment attack against a Django model? If yes, how and when?</li>
-<li>What parts of Django are susceptible to SQL injection attacks and how does Django defend against these attacks?</li>
-<li>Why is the SECRET_KEY so important?</li>
-<li>When looking for a denial of service vector, which part of Django stands out as the most vulnerable?</li>
-<li>Is Django threadsafe? If not, how does this effect the security of the application?</li>
-<li>How does Django&rsquo;s permission model work? Is it effective?</li>
-<li>How does Django&rsquo;s file uploading functionality work? How would you make it more secure?</li>
-<li>How does Django deal with directory traversal vulnerabilities?</li>
-<li>How does Django deal with CSRF? Is it totally effective?</li>
-</ul>
-
+    
   </section>
   <footer>
     
@@ -165,7 +117,7 @@
     <section class="author-info row">
       <div class="author-avatar col-md-2">
         
-        <img alt="Author Avatar" src="http://www.levigross.com/img/james.jpeg" />
+        <img alt="Author Avatar" src="/img/james.jpeg" />
         
       </div>
       <div class="author-meta col-md-6">
@@ -187,10 +139,10 @@
     </section>
     <ul class="pager">
       
-      <li class="previous"><a href="http://www.levigross.com/pages/reading-list/"><span aria-hidden="true">&larr;</span> Older</a></li>
+      <li class="previous"><a href="http://localhost:1313/2014/01/37-tips-for-interviewing-a-tech-company/"><span aria-hidden="true">&larr;</span> Older</a></li>
       
       
-      <li class="next"><a href="http://www.levigross.com/2014/02/07/constant-time-comparison-functions-in...-python-haskell-clojure-and-java/">Newer <span aria-hidden="true">&rarr;</span></a></li>
+      <li class="next"><a href="http://localhost:1313/2014/02/constant-time-comparison-functions-in...-python-haskell-clojure-and-java/">Newer <span aria-hidden="true">&rarr;</span></a></li>
       
     </ul>
   </footer>
@@ -228,7 +180,7 @@
   
   
   
-  <a href="http://www.levigross.com/pages/about/">
+  <a href="/pages/about/">
     <i class="fa fa-user"></i>
   </a>
   
@@ -236,7 +188,7 @@
 
   </footer>
 
-  <script src="http://www.levigross.com/js/highlight.pack.js"></script>
+  <script src="http://localhost:1313/js/highlight.pack.js"></script>
   <script>
     hljs.initHighlightingOnLoad();
   </script>
@@ -251,6 +203,9 @@
   </script>
   
   
-</body>
+<script data-no-instant>document.write('<script src="http://'
+        + (location.host || 'localhost').split(':')[0]
+		+ ':1313/livereload.js?mindelay=10"></'
+        + 'script>')</script></body>
 </html>
 

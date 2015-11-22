@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Pages on Making simple things extremely complex</title>
+    <link>http://www.levigross.com/pages/</link>
+    <description>Recent content in Pages on Making simple things extremely complex</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; Levi Gross</copyright>
+    <lastBuildDate>Sat, 21 Nov 2015 21:12:12 -0500</lastBuildDate>
+    <atom:link href="http://www.levigross.com/pages/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>About Levi Gross</title>
+      <link>http://www.levigross.com/pages/about/</link>
+      <pubDate>Sat, 21 Nov 2015 21:12:12 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/pages/about/</guid>
+      <description>
+
+&lt;p&gt;I&amp;rsquo;m Levi Gross, a human living in Brooklyn.&lt;/p&gt;
+
+&lt;h2 id=&#34;where-i-work:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Where I Work&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.genesys.com/&#34;&gt;Genesys&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.newschool.edu/&#34;&gt;The New School&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;where-used-i-work:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Where Used I Work&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.matasano.com/&#34;&gt;Matasano&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.axial.net/&#34;&gt;Axial&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;contact-me:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Contact Me&lt;/h2&gt;
+
+&lt;p&gt;Please feel free to send me an email &lt;a href=&#34;mailto:levi@levigross.com&#34;&gt;levi@levigross.com&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;notes:6083a88ee3411b0d17ce02d738f69d47&#34;&gt;Notes&lt;/h3&gt;
+
+&lt;p&gt;&lt;em&gt;This blog is a collection of my &lt;em&gt;personal&lt;/em&gt; thoughts and does not represent the views of my employers&amp;rsquo;, past, present, and future.&lt;/em&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Reading List</title>
+      <link>http://www.levigross.com/pages/reading-list/</link>
+      <pubDate>Fri, 07 Feb 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://www.levigross.com/pages/reading-list/</guid>
+      <description>
+
+&lt;p&gt;Here is a list of books that I recommend. They have really helped me gain a better understanding, and I whole heartily recommend them.&lt;/p&gt;
+
+&lt;h1 id=&#34;django:46049c794a9829e53b0f15bbb4f2969a&#34;&gt;Django&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/1481879707/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=1481879707&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;2 Scoops of Django&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;python:46049c794a9829e53b0f15bbb4f2969a&#34;&gt;Python&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/1118290275/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=1118290275&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;Data Structures and Algorithms in Python&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/0132678209/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0132678209&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;Core Python Applications Programming (3rd Edition) (Core Series)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/0132269937/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0132269937&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;Core Python Programming (2nd Edition)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;general-development:46049c794a9829e53b0f15bbb4f2969a&#34;&gt;General Development&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/020161622X/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=020161622X&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;The Pragmatic Programmer: From Journeyman to Master&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/020161586X/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=020161586X&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;The Practice of Programming (Addison-Wesley Professional Computing Series)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.amazon.com/gp/product/0201835959/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=1789&amp;amp;creative=390957&amp;amp;creativeASIN=0201835959&amp;amp;linkCode=as2&amp;amp;tag=jewelerslcom-20&#34;&gt;The Mythical Man-Month: Essays on Software Engineering&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
