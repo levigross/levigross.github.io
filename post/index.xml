@@ -166,12 +166,12 @@ ko.applyBindings(new ViewModel(&amp;quot;Planet&amp;quot;, &amp;quot;Earth&amp;q
     </item>
     
     <item>
-      <title>How to write an encrypt and decrypt API for data at rest in Node.JS</title>
-      <link>http://www.levigross.com/2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-node.js/</link>
+      <title>How to write an encrypt and decrypt API for data at rest in NodeJS</title>
+      <link>http://www.levigross.com/2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-nodejs/</link>
       <pubDate>Sun, 30 Mar 2014 21:48:00 -0500</pubDate>
       
-      <guid>http://www.levigross.com/2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-node.js/</guid>
-      <description>&lt;p&gt;The following code can be used to encrypt data at rest using Node.JS. The snippet is self contained and should be slightly modified so that key generation doesn&amp;rsquo;t happen every time the code is executed.&lt;/p&gt;
+      <guid>http://www.levigross.com/2014/03/30/how-to-write-an-encrypt-and-decrypt-api-for-data-at-rest-in-nodejs/</guid>
+      <description>&lt;p&gt;The following code can be used to encrypt data at rest using Node.JS. The snippet is self-contained and should be slightly modified so that key generation doesn&amp;rsquo;t happen every time the code is executed.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-javascript&#34;&gt;/*
  Copyright 2014 Levi Gross. All Rights Reserved.
