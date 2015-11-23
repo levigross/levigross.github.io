@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head prefix="og: http://ogp.me/ns#">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <meta property="og:title" content=" Mutual TLS authentication in Go &middot;  Welcome to my blog" />
+  
+  <meta property="og:site_name" content="Welcome to my blog" />
+  <meta property="og:url" content="http://www.levigross.com/2015/11/21/mutual-tls-authentication-in-go/" />
+  
+  
+  <meta property="og:type" content="article" />
+  
+  <meta property="og:article:published_time" content="2015-11-21T22:17:13-05:00" />
+  
+  
+
+  <title>
+     Mutual TLS authentication in Go &middot;  Welcome to my blog
+  </title>
+
+  <link rel="stylesheet" href="http://www.levigross.com/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="http://www.levigross.com/css/main.css" />
+  <link rel="stylesheet" href="http://www.levigross.com/css/font-awesome.min.css" />
+  <link rel="stylesheet" href="http://www.levigross.com/css/github.css" />
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400" type="text/css">
+  <link rel="shortcut icon" href="http://www.levigross.com/images/favicon.ico" />
+  <link rel="apple-touch-icon" href="http://www.levigross.com/images/apple-touch-icon.png" />
+  
+</head>
+<body>
+    <header class="global-header"  style="background-image:url( /images/bg.jpg )">
+    <section class="header-text">
+      <h1><a href="http://www.levigross.com/">Welcome to my blog</a></h1>
+      
+      <div class="tag-line">
+        Which is a collection of my personal thoughts
+      </div>
+      
+      <div class="sns-links hidden-print">
+  
+  <a href="mailto:levi@levigross.com">
+    <i class="fa fa-envelope"></i>
+  </a>
+  
+  
+  <a href="https://twitter.com/levigross" target="_blank">
+    <i class="fa fa-twitter"></i>
+  </a>
+  
+  
+  
+  
+  
+  <a href="https://github.com/levigross" target="_blank">
+    <i class="fa fa-github"></i>
+  </a>
+  
+  
+  
+  <a href="https://linkedin.com/in/levigross7" target="_blank">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="http://www.levigross.com/pages/about/">
+    <i class="fa fa-user"></i>
+  </a>
+  
+</div>
+
+      
+      <a href="http://www.levigross.com/" class="btn-header btn-back hidden-xs">
+        <i class="fa fa-angle-left" aria-hidden="true"></i>
+        &nbsp;Home
+      </a>
+      
+      
+    </section>
+  </header>
+  <main class="container">
+
+
+<article>
+  <header>
+    <h1 class="text-primary">Mutual TLS authentication in Go</h1>
+    <div class="post-meta clearfix">
+      <div class="post-date pull-left">
+        Posted on
+        <time datetime="2015-11-21T22:17:13-05:00">
+          Nov 21, 2015
+        </time>
+      </div>
+      <div class="pull-right">
+        
+      </div>
+    </div>
+  </header>
+  <section>
+    
+
+<p>Go has an amazing TLS library. While it can be used in conjunction with the
+&lsquo;net/http&rsquo; package to provide TLS protected transport for HTTP traffic (and now http2),
+people are starting to use it for authentication as well by way of mutual TLS.</p>
+
+<p>Below we are going to explore how to safely implement mutual TLS authentication
+and some common pitfalls that can occur.</p>
+
+<p>If you would just like to look at code, here is a straightforward example: <a href="https://github.com/levigross/go-mutual-tls">https://github.com/levigross/go-mutual-tls</a></p>
+
+<p>The code for the client and the server is straightforward.</p>
+
+<h3 id="generating-the-certificate:7ffda60c22cc2811adc762298e033116">Generating the certificate</h3>
+
+<p>I have modified the <code>generate_cert.go</code> program to generate TLS client certificates:
+The new code can be found here: <a href="https://github.com/levigross/go-mutual-tls/blob/master/generate_client_cert.go">generate_client_cert.go</a></p>
+
+<p>The easiest way to generate a client+server TLS certificate is by running the following command:</p>
+
+<p><code>go run generate_client_cert.go -email-address=a@a.com -ca -ecdsa-curve=P521</code></p>
+
+<p>This command will generate two files:</p>
+
+<ul>
+<li><code>key.pem</code></li>
+<li><code>cert.pem</code></li>
+</ul>
+
+<p>Which can be used by the TLS server and client to authenticate.</p>
+
+<h3 id="configuring-the-tls-server:7ffda60c22cc2811adc762298e033116">Configuring the TLS server</h3>
+
+<p>It is really important to understand and implement this step properly.</p>
+
+<p>Let&rsquo;s start off with a list of requirements:</p>
+
+<ol>
+<li>We need to <em>ensure</em> that our TLS server only uses the appropriate CA, <em>and no other CAs</em>.</li>
+<li>We need to set the <code>ClientAuth</code> portion within <code>tls.Config</code> to <code>tls.RequireAndVerifyClientCert</code></li>
+</ol>
+
+<p>For fun we can ensure that the server requires:</p>
+
+<ol>
+<li>TLS version is 1.2</li>
+<li>The cipher provides <a href="https://en.wikipedia.org/wiki/Forward_secrecy">forward secrecy</a></li>
+</ol>
+
+<pre><code class="language-go">tlsConfig := &amp;tls.Config{
+	// Reject any TLS certificate that cannot be validated
+	ClientAuth: tls.RequireAndVerifyClientCert,
+	// Ensure that we only use our &quot;CA&quot; to validate certificates
+	ClientCAs: clientCertPool,
+	// PFS because we can but this will reject client with RSA certificates
+	CipherSuites: []uint16{tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384},
+	// Force it server side
+	PreferServerCipherSuites: true,
+	// TLS 1.2 because we can
+	MinVersion: tls.VersionTLS12,
+}
+
+tlsConfig.BuildNameToCertificate()
+
+</code></pre>
+
+<p>The first two items are the most imporant! <strong>Without them there is a potential authentication bypass vulnerability</strong>.</p>
+
+<h3 id="setting-up-the-server:7ffda60c22cc2811adc762298e033116">Setting up the server</h3>
+
+<p>Now that we have our custom <code>&amp;tls.Config{}</code> struct, we can create the server:</p>
+
+<pre><code class="language-go">http.HandleFunc(&quot;/&quot;, HelloUser)
+
+httpServer := &amp;http.Server{
+	Addr:      &quot;:8080&quot;,
+	TLSConfig: tlsConfig,
+}
+
+log.Println(httpServer.ListenAndServeTLS(&quot;../cert.pem&quot;, &quot;../key.pem&quot;))
+</code></pre>
+
+<p>Now that we have our server, we need to build a view that returns a greeting to our user:</p>
+
+<pre><code class="language-go">// HelloUser is a view that greets a user
+func HelloUser(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, &quot;Hello %v! \n&quot;, req.TLS.PeerCertificates[0].EmailAddresses[0])
+}
+</code></pre>
+
+<p><em>It is important to remember that while the TLS server does authenticate and
+ validate the user&rsquo;s certificate, we need to know who this user is.</em></p>
+
+<h3 id="building-the-client:7ffda60c22cc2811adc762298e033116">Building the client</h3>
+
+<p>To build our client, we need to:</p>
+
+<ol>
+<li>Lock ourselves into our custom CA</li>
+<li>Ensure that our client uses our TLS client certificate</li>
+</ol>
+
+<pre><code class="language-go">// Load our TLS key pair to use for authentication
+cert, err := tls.LoadX509KeyPair(&quot;../cert.pem&quot;, &quot;../key.pem&quot;)
+if err != nil {
+	log.Fatalln(&quot;Unable to load cert&quot;, err)
+}
+
+// Load our CA certificate
+clientCACert, err := ioutil.ReadFile(&quot;../cert.pem&quot;)
+if err != nil {
+	log.Fatal(&quot;Unable to open cert&quot;, err)
+}
+
+clientCertPool := x509.NewCertPool()
+clientCertPool.AppendCertsFromPEM(clientCACert)
+
+tlsConfig := &amp;tls.Config{
+	Certificates: []tls.Certificate{cert},
+	RootCAs:      clientCertPool,
+}
+
+tlsConfig.BuildNameToCertificate()
+
+</code></pre>
+
+<p>Once we have a valid <code>tls.Config</code>, we can build a custom <code>http.Client</code> that handles the request. I will use <a href="https://github.com/levigross/grequests">GRequests</a> to handle that:</p>
+
+<pre><code class="language-go">ro := &amp;grequests.RequestOptions{
+	HTTPClient: &amp;http.Client{
+		Transport: &amp;http.Transport{TLSClientConfig: tlsConfig},
+	},
+}
+resp, err := grequests.Get(&quot;https://localhost:8080&quot;, ro)
+if err != nil {
+	log.Println(&quot;Unable to speak to our server&quot;, err)
+}
+
+// Lets print the message
+log.Println(resp.String())
+</code></pre>
+
+<h3 id="final-thoughts:7ffda60c22cc2811adc762298e033116">Final Thoughts</h3>
+
+<p>As you see, it is easy to implement mutual TLS authentication in Go. It is important to remember</p>
+
+<ul>
+<li><em><strong>Authentication is not authorization</strong></em> and you need to go through the TLS peer certificates to find your user.</li>
+<li>You <strong>must</strong> set a custom CA. If you don&rsquo;t, Go will use the CA pool that comes with your server.</li>
+</ul>
+
+<pre><code class="language-go">// An empty list of certificateAuthorities signals to
+// the client that it may send any certificate in response
+// to our request. When we know the CAs we trust, then
+// we can send them down, so that the client can choose
+// an appropriate certificate to give to us.
+if config.ClientCAs != nil {
+	certReq.certificateAuthorities = config.ClientCAs.Subjects()
+}
+</code></pre>
+
+<p>SRC: <a href="https://github.com/golang/go/blob/release-branch.go1.5/src/crypto/tls/handshake_server.go#L395-L402">https://github.com/golang/go/blob/release-branch.go1.5/src/crypto/tls/handshake_server.go#L395-L402</a></p>
+
+  </section>
+  <footer>
+    
+    <hr/>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+      var disqus_shortname = 'levigross';
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    
+    <section class="author-info row">
+      <div class="author-avatar col-md-2">
+        
+        <img alt="Author Avatar" src="http://www.levigross.com/img/james.jpeg" />
+        
+      </div>
+      <div class="author-meta col-md-6">
+        
+        <h1 class="author-name text-primary">Levi Gross</h1>
+        
+        
+        <div class="author-bio">Human living in Brooklyn, NYC</div>
+        
+      </div>
+      
+      <div class="author-contact col-md-4">
+        <a href="mailto:levi@levigross.com">
+          <i class="fa fa-envelope-o" aria-hidden="true"></i>
+          &nbsp;Contact me
+        </a>
+      </div>
+      
+    </section>
+    <ul class="pager">
+      
+      <li class="previous"><a href="http://www.levigross.com/pages/about/"><span aria-hidden="true">&larr;</span> Older</a></li>
+      
+      
+      <li class="next disabled"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+      
+    </ul>
+  </footer>
+</article>
+
+  </main>
+  <footer class="container global-footer">
+    <div class="copyright-note pull-left">
+      &copy; Levi Gross
+    </div>
+    <div class="sns-links hidden-print">
+  
+  <a href="mailto:levi@levigross.com">
+    <i class="fa fa-envelope"></i>
+  </a>
+  
+  
+  <a href="https://twitter.com/levigross" target="_blank">
+    <i class="fa fa-twitter"></i>
+  </a>
+  
+  
+  
+  
+  
+  <a href="https://github.com/levigross" target="_blank">
+    <i class="fa fa-github"></i>
+  </a>
+  
+  
+  
+  <a href="https://linkedin.com/in/levigross7" target="_blank">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="http://www.levigross.com/pages/about/">
+    <i class="fa fa-user"></i>
+  </a>
+  
+</div>
+
+  </footer>
+
+  <script src="http://www.levigross.com/js/highlight.pack.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-19381157-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  
+  
+</body>
+</html>
+

@@ -7,8 +7,179 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; Levi Gross</copyright>
-    <lastBuildDate>Sat, 21 Nov 2015 20:50:59 -0500</lastBuildDate>
+    <lastBuildDate>Sat, 21 Nov 2015 22:17:13 -0500</lastBuildDate>
     <atom:link href="http://www.levigross.com/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Mutual TLS authentication in Go</title>
+      <link>http://www.levigross.com/2015/11/21/mutual-tls-authentication-in-go/</link>
+      <pubDate>Sat, 21 Nov 2015 22:17:13 -0500</pubDate>
+      
+      <guid>http://www.levigross.com/2015/11/21/mutual-tls-authentication-in-go/</guid>
+      <description>
+
+&lt;p&gt;Go has an amazing TLS library. While it can be used in conjunction with the
+&amp;lsquo;net/http&amp;rsquo; package to provide TLS protected transport for HTTP traffic (and now http2),
+people are starting to use it for authentication as well by way of mutual TLS.&lt;/p&gt;
+
+&lt;p&gt;Below we are going to explore how to safely implement mutual TLS authentication
+and some common pitfalls that can occur.&lt;/p&gt;
+
+&lt;p&gt;If you would just like to look at code, here is a straightforward example: &lt;a href=&#34;https://github.com/levigross/go-mutual-tls&#34;&gt;https://github.com/levigross/go-mutual-tls&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The code for the client and the server is straightforward.&lt;/p&gt;
+
+&lt;h3 id=&#34;generating-the-certificate:7ffda60c22cc2811adc762298e033116&#34;&gt;Generating the certificate&lt;/h3&gt;
+
+&lt;p&gt;I have modified the &lt;code&gt;generate_cert.go&lt;/code&gt; program to generate TLS client certificates:
+The new code can be found here: &lt;a href=&#34;https://github.com/levigross/go-mutual-tls/blob/master/generate_client_cert.go&#34;&gt;generate_client_cert.go&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The easiest way to generate a client+server TLS certificate is by running the following command:&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;go run generate_client_cert.go -email-address=a@a.com -ca -ecdsa-curve=P521&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This command will generate two files:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;key.pem&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;cert.pem&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Which can be used by the TLS server and client to authenticate.&lt;/p&gt;
+
+&lt;h3 id=&#34;configuring-the-tls-server:7ffda60c22cc2811adc762298e033116&#34;&gt;Configuring the TLS server&lt;/h3&gt;
+
+&lt;p&gt;It is really important to understand and implement this step properly.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start off with a list of requirements:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;We need to &lt;em&gt;ensure&lt;/em&gt; that our TLS server only uses the appropriate CA, &lt;em&gt;and no other CAs&lt;/em&gt;.&lt;/li&gt;
+&lt;li&gt;We need to set the &lt;code&gt;ClientAuth&lt;/code&gt; portion within &lt;code&gt;tls.Config&lt;/code&gt; to &lt;code&gt;tls.RequireAndVerifyClientCert&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;For fun we can ensure that the server requires:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;TLS version is 1.2&lt;/li&gt;
+&lt;li&gt;The cipher provides &lt;a href=&#34;https://en.wikipedia.org/wiki/Forward_secrecy&#34;&gt;forward secrecy&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;tlsConfig := &amp;amp;tls.Config{
+	// Reject any TLS certificate that cannot be validated
+	ClientAuth: tls.RequireAndVerifyClientCert,
+	// Ensure that we only use our &amp;quot;CA&amp;quot; to validate certificates
+	ClientCAs: clientCertPool,
+	// PFS because we can but this will reject client with RSA certificates
+	CipherSuites: []uint16{tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384},
+	// Force it server side
+	PreferServerCipherSuites: true,
+	// TLS 1.2 because we can
+	MinVersion: tls.VersionTLS12,
+}
+
+tlsConfig.BuildNameToCertificate()
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The first two items are the most imporant! &lt;strong&gt;Without them there is a potential authentication bypass vulnerability&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;setting-up-the-server:7ffda60c22cc2811adc762298e033116&#34;&gt;Setting up the server&lt;/h3&gt;
+
+&lt;p&gt;Now that we have our custom &lt;code&gt;&amp;amp;tls.Config{}&lt;/code&gt; struct, we can create the server:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;http.HandleFunc(&amp;quot;/&amp;quot;, HelloUser)
+
+httpServer := &amp;amp;http.Server{
+	Addr:      &amp;quot;:8080&amp;quot;,
+	TLSConfig: tlsConfig,
+}
+
+log.Println(httpServer.ListenAndServeTLS(&amp;quot;../cert.pem&amp;quot;, &amp;quot;../key.pem&amp;quot;))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now that we have our server, we need to build a view that returns a greeting to our user:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// HelloUser is a view that greets a user
+func HelloUser(w http.ResponseWriter, req *http.Request) {
+	fmt.Fprintf(w, &amp;quot;Hello %v! \n&amp;quot;, req.TLS.PeerCertificates[0].EmailAddresses[0])
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;It is important to remember that while the TLS server does authenticate and
+ validate the user&amp;rsquo;s certificate, we need to know who this user is.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;building-the-client:7ffda60c22cc2811adc762298e033116&#34;&gt;Building the client&lt;/h3&gt;
+
+&lt;p&gt;To build our client, we need to:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Lock ourselves into our custom CA&lt;/li&gt;
+&lt;li&gt;Ensure that our client uses our TLS client certificate&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// Load our TLS key pair to use for authentication
+cert, err := tls.LoadX509KeyPair(&amp;quot;../cert.pem&amp;quot;, &amp;quot;../key.pem&amp;quot;)
+if err != nil {
+	log.Fatalln(&amp;quot;Unable to load cert&amp;quot;, err)
+}
+
+// Load our CA certificate
+clientCACert, err := ioutil.ReadFile(&amp;quot;../cert.pem&amp;quot;)
+if err != nil {
+	log.Fatal(&amp;quot;Unable to open cert&amp;quot;, err)
+}
+
+clientCertPool := x509.NewCertPool()
+clientCertPool.AppendCertsFromPEM(clientCACert)
+
+tlsConfig := &amp;amp;tls.Config{
+	Certificates: []tls.Certificate{cert},
+	RootCAs:      clientCertPool,
+}
+
+tlsConfig.BuildNameToCertificate()
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Once we have a valid &lt;code&gt;tls.Config&lt;/code&gt;, we can build a custom &lt;code&gt;http.Client&lt;/code&gt; that handles the request. I will use &lt;a href=&#34;https://github.com/levigross/grequests&#34;&gt;GRequests&lt;/a&gt; to handle that:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;ro := &amp;amp;grequests.RequestOptions{
+	HTTPClient: &amp;amp;http.Client{
+		Transport: &amp;amp;http.Transport{TLSClientConfig: tlsConfig},
+	},
+}
+resp, err := grequests.Get(&amp;quot;https://localhost:8080&amp;quot;, ro)
+if err != nil {
+	log.Println(&amp;quot;Unable to speak to our server&amp;quot;, err)
+}
+
+// Lets print the message
+log.Println(resp.String())
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;final-thoughts:7ffda60c22cc2811adc762298e033116&#34;&gt;Final Thoughts&lt;/h3&gt;
+
+&lt;p&gt;As you see, it is easy to implement mutual TLS authentication in Go. It is important to remember&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;&lt;strong&gt;Authentication is not authorization&lt;/strong&gt;&lt;/em&gt; and you need to go through the TLS peer certificates to find your user.&lt;/li&gt;
+&lt;li&gt;You &lt;strong&gt;must&lt;/strong&gt; set a custom CA. If you don&amp;rsquo;t, Go will use the CA pool that comes with your server.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// An empty list of certificateAuthorities signals to
+// the client that it may send any certificate in response
+// to our request. When we know the CAs we trust, then
+// we can send them down, so that the client can choose
+// an appropriate certificate to give to us.
+if config.ClientCAs != nil {
+	certReq.certificateAuthorities = config.ClientCAs.Subjects()
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SRC: &lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.5/src/crypto/tls/handshake_server.go#L395-L402&#34;&gt;https://github.com/golang/go/blob/release-branch.go1.5/src/crypto/tls/handshake_server.go#L395-L402&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Migrating to Hugo</title>
